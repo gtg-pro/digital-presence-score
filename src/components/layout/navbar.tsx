@@ -160,12 +160,16 @@ export function Navbar() {
         <Link
           href="/"
           className={cn(
-            "relative z-10 flex min-w-0 max-w-[55%] shrink items-center sm:max-w-[14rem]",
+            "relative z-10 flex shrink-0 items-center",
             "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           )}
           onClick={closeMobile}
         >
-          <SiteLogo height={90} priority className="h-10 w-auto sm:h-11" />
+          <SiteLogo
+            height={56}
+            priority
+            className="h-12 w-auto sm:h-14"
+          />
         </Link>
 
         <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">

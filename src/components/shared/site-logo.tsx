@@ -11,9 +11,15 @@ export type SiteLogoProps = {
    * Use `onDark` to invert on black/inverted surfaces.
    */
   surface?: "onLight" | "onDark";
-  /** Visual height in pixels; width scales from the source aspect ratio. */
+  /**
+   * Intrinsic height for Next/Image aspect ratio (not a CSS override).
+   * Prefer Tailwind classes in `className` for on-screen size.
+   */
   height?: number;
-  /** Visual width in pixels; height scales when height is omitted. */
+  /**
+   * Intrinsic width for Next/Image aspect ratio (not a CSS override).
+   * Prefer Tailwind classes in `className` for on-screen size.
+   */
   width?: number;
   priority?: boolean;
 };
@@ -42,14 +48,12 @@ export function SiteLogo({
       width={resolvedWidth}
       height={resolvedHeight}
       priority={priority}
-      sizes={`${resolvedWidth}px`}
-      style={{
-        width: resolvedWidth,
-        height: "auto",
-        maxHeight: resolvedHeight,
-      }}
+      sizes="(max-width: 640px) 70vw, 352px"
       className={cn(
-        "object-contain",
+        // Display size must come from CSS so Tailwind wins in every environment.
+        // Do not set width/height/maxHeight inline — inline styles override
+        // utility classes and caused Netlify logos to ignore h-* / max-w-*.
+        "h-auto w-auto max-w-full object-contain",
         surface === "onDark" && "invert",
         className,
       )}
