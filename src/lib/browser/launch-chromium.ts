@@ -37,8 +37,12 @@ export type LaunchAuditBrowserOptions = {
 };
 
 /**
- * Netlify / AWS Lambda Linux runtimes do not ship Playwright's downloaded
- * Chromium. Detect those hosts so we can use @sparticuz/chromium instead.
+ * Serverless Linux hosts (Netlify / Vercel / Lambda) do not ship Playwright's
+ * downloaded Chromium. Detect those hosts so we use @sparticuz/chromium.
+ *
+ * Important: Vercel Fluid Compute may omit AWS_LAMBDA_* / LAMBDA_TASK_ROOT,
+ * so VERCEL must be checked explicitly. NETLIFY alone is not enough after a
+ * host migration.
  */
 export function isServerlessLinuxRuntime(
   env: Record<string, string | undefined> = process.env,
@@ -50,7 +54,11 @@ export function isServerlessLinuxRuntime(
   return Boolean(
     env.AWS_LAMBDA_FUNCTION_NAME ||
       env.LAMBDA_TASK_ROOT ||
-      env.NETLIFY === "true",
+      env.NETLIFY === "true" ||
+      // Vercel sets VERCEL=1 at build + runtime when system env vars are enabled.
+      env.VERCEL === "1" ||
+      env.VERCEL === "true" ||
+      Boolean(env.VERCEL_ENV),
   );
 }
 

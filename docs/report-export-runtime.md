@@ -5,7 +5,7 @@ Server-side exports use Playwright Chromium (`page.setContent` only; no arbitrar
 ## Requirements
 
 - **Local / persistent Node:** Playwright Chromium (`npx playwright install chromium`).
-- **Netlify / AWS Lambda Linux:** `@sparticuz/chromium` (bundled via NFT includes + `netlify.toml`). Launch uses `launchAuditBrowser()` — not Playwright’s default downloaded browser.
+- **Netlify / Vercel / AWS Lambda Linux:** `@sparticuz/chromium` (bundled via NFT includes; `netlify.toml` for Netlify memory). Launch uses `launchAuditBrowser()` when `VERCEL` / `NETLIFY` / Lambda env is detected — not Playwright’s default downloaded browser.
 - Sufficient memory for headless Chromium (Netlify functions set to 2048 MB in `netlify.toml`; ≥512 MB free typical).
 - Request timeout budget ≥30s for PDF/PNG generation on cold start.
 

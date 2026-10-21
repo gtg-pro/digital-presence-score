@@ -13,6 +13,13 @@ describe("isServerlessLinuxRuntime", () => {
     ).toBe(true);
   });
 
+  it("detects Vercel Linux even without Lambda env vars", () => {
+    expect(isServerlessLinuxRuntime({ VERCEL: "1" }, "linux")).toBe(true);
+    expect(
+      isServerlessLinuxRuntime({ VERCEL_ENV: "production" }, "linux"),
+    ).toBe(true);
+  });
+
   it("detects AWS Lambda", () => {
     expect(
       isServerlessLinuxRuntime(
@@ -27,7 +34,7 @@ describe("isServerlessLinuxRuntime", () => {
       isServerlessLinuxRuntime({ NETLIFY: "true" }, "win32"),
     ).toBe(false);
     expect(
-      isServerlessLinuxRuntime({ NETLIFY: "true" }, "darwin"),
+      isServerlessLinuxRuntime({ VERCEL: "1" }, "darwin"),
     ).toBe(false);
   });
 

@@ -46,12 +46,14 @@ Verified against the Prompt 21–24 implementation.
 - Client disconnect aborts the in-flight stream where supported.
 - Retry starts a fresh assessment (pending cookie retained on technical failure).
 
-## Browser / crawl runtime (Netlify)
+## Browser / crawl runtime (Netlify / Vercel)
 
-- Live crawls require a launchable Chromium. On Netlify Linux functions this is `@sparticuz/chromium` (not Playwright’s cached browser download).
+- Live crawls require a launchable Chromium. On serverless Linux (Netlify, Vercel, Lambda) this is `@sparticuz/chromium` (not Playwright’s cached browser download).
+- Runtime detection must include `VERCEL` / `VERCEL_ENV` — Vercel Fluid Compute may omit `AWS_LAMBDA_*`, so a Netlify-only check incorrectly falls back to Playwright’s missing browser and shows `browser_executable_missing` with the `npx playwright install` hint.
 - If browser launch fails, the assessment returns **LIMITED_VISIBILITY** with crawl error `browser_executable_missing` / `browser_launch_failed`, evidence coverage 0%, and PageSpeed/OpenAI marked **skipped** with explicit reasons (not silent `not_requested`).
 - Crawl diagnostics record launch attempt/success, sanitized failure reason, navigation counts, robots decision, and final crawler status — without secrets or raw HTML.
 - SSRF and robots restrictions are unchanged. Genuine inaccessible sites still correctly produce LIMITED_VISIBILITY.
+- API keys (`OPENAI_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `REPORT_SESSION_SECRET`) do not install Chromium; missing keys only affect later stages after a successful crawl.
 
 ## E2E fixtures (test-only)
 
