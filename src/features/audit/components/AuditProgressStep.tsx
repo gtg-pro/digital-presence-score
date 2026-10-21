@@ -72,7 +72,11 @@ export function AuditProgressStep({ stage, isLast }: AuditProgressStepProps) {
   const StatusIcon = presentation.StatusIcon;
 
   return (
-    <li className="relative flex gap-4 pb-8 last:pb-0">
+    <li
+      className="relative flex gap-4 pb-8 last:pb-0"
+      data-stage-id={stage.id}
+      data-stage-status={stage.status}
+    >
       {!isLast ? (
         <span
           aria-hidden="true"

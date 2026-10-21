@@ -84,7 +84,7 @@ export type ReportMethodology = {
   assessmentScope: string;
   evidenceCoverageNote: string;
   limitations: string[];
-  sources: Array<{ label: string; observedAtLabel: string }>;
+  sources: Array<{ id: string; label: string; observedAtLabel: string }>;
   partialAndLimitedExplanation: string;
   disclaimer: string;
 };

@@ -80,7 +80,7 @@ export function MethodologySection({
             <dd className="mt-1">
               <ul className="space-y-1 text-muted-foreground">
                 {methodology.sources.map((source) => (
-                  <li key={source.label}>
+                  <li key={source.id}>
                     {source.label} — {source.observedAtLabel}
                   </li>
                 ))}

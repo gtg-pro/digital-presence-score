@@ -17,6 +17,66 @@ async function waitForLiveReport(page: Page) {
 }
 
 test.describe("Prompt 23 end-to-end audit journey", () => {
+  test("homepage submit must POST /api/audit/run exactly once and leave Pending", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "chromium-desktop",
+      "Stream init regression on desktop",
+    );
+
+    const auditPosts: string[] = [];
+    page.on("request", (request) => {
+      if (
+        request.method() === "POST" &&
+        request.url().includes("/api/audit/run")
+      ) {
+        auditPosts.push(request.url());
+      }
+    });
+
+    const firstAuditPost = page.waitForRequest(
+      (request) =>
+        request.method() === "POST" &&
+        request.url().includes("/api/audit/run"),
+      { timeout: 30_000 },
+    );
+
+    await page.goto("/");
+    await page.getByPlaceholder(/example-service/i).fill("https://example.com");
+    await page.getByRole("button", { name: /get my free report/i }).click();
+    await expect(page).toHaveURL(/\/audit\/progress/);
+
+    await firstAuditPost;
+
+    // Fixture audits can finish and hard-navigate before stage DOM is asserted.
+    await Promise.race([
+      page.waitForURL(/\/report\/live-/, { timeout: 60_000 }),
+      page
+        .locator(
+          '[data-stage-id="business-discovery"]:not([data-stage-status="pending"])',
+        )
+        .waitFor({ state: "visible", timeout: 60_000 }),
+    ]);
+
+    // Production webServer (no Strict Mode double-invoke): exactly one audit POST.
+    expect(auditPosts.length).toBe(1);
+
+    if (page.url().includes("/audit/progress")) {
+      await expect(
+        page.locator("[data-audit-pending-session='yes']"),
+      ).toBeVisible();
+      await expect(
+        page.locator("[data-audit-fetch-initiated='yes']"),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: /audit session missing/i }),
+      ).toHaveCount(0);
+    } else {
+      await expect(page).toHaveURL(/\/report\/live-/);
+    }
+  });
+
   test("homepage URL → progress → live report → PDF/PNG", async ({
     page,
   }, testInfo) => {
@@ -97,7 +157,6 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
 
   test("PARTIAL and LIMITED fixtures complete via SSE API", async ({
     request,
-    page,
   }, testInfo) => {
     test.skip(
       testInfo.project.name !== "chromium-desktop",
@@ -105,14 +164,7 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
     );
 
     for (const kind of ["partial", "limited"] as const) {
-      // Seed pending session via form so cookies exist, then run stream with fixture header.
-      await page.context().clearCookies();
-      await submitAuditForm(page, "https://example.com");
-      await expect(page).toHaveURL(/\/audit\/progress/);
-
-      // Abort UI run by navigating away, then call API with fixture override.
-      await page.goto("/audit");
-
+      // Body supplies inputs — do not start a competing UI audit (concurrency).
       const response = await request.post("/api/audit/run", {
         headers: {
           Accept: "text/event-stream",

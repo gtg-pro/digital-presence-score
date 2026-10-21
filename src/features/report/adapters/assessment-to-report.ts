@@ -278,11 +278,18 @@ function mapEvidenceItems(result: AssessmentResult): ReportEvidenceItem[] {
   return result.evidenceCatalog
     .filter((item) => safeHttpUrl(item.sourceUrl) || item.kind === "website")
     .slice(0, 40)
-    .map((item) => ({
-      id: item.id,
-      label: `${item.kind}: ${safeHttpUrl(item.sourceUrl) ?? item.sourceUrl}`,
-      observedAtLabel: formatUtcLabel(item.observedAt),
-    }));
+    .map((item) => {
+      const url = safeHttpUrl(item.sourceUrl) ?? item.sourceUrl;
+      const device =
+        item.kind === "pagespeed" && item.deviceStrategy
+          ? ` (${item.deviceStrategy})`
+          : "";
+      return {
+        id: item.id,
+        label: `${item.kind}${device}: ${url}`,
+        observedAtLabel: formatUtcLabel(item.observedAt),
+      };
+    });
 }
 
 function coveragePercent(result: AssessmentResult): number {
@@ -370,6 +377,7 @@ export function mapAssessmentToReport(
           ? limitations
           : [LIVE_SCORING_POLICY_EXPLANATION],
       sources: mapEvidenceItems(result).map((item) => ({
+        id: item.id,
         label: item.label,
         observedAtLabel: item.observedAtLabel,
       })),

@@ -253,8 +253,8 @@ export const completeAuditDemo: DigitalPresenceReport = {
     },
   ],
   methodology: sharedMethodology("Approximately 92% of planned public checks had usable evidence in this demo fixture.", [
-    { label: "example-service.com homepage", observedAtLabel: "Demo observation" },
-    { label: "Service page sample set", observedAtLabel: "Demo observation" },
+    { id: "demo-src-home", label: "example-service.com homepage", observedAtLabel: "Demo observation" },
+    { id: "demo-src-services", label: "Service page sample set", observedAtLabel: "Demo observation" },
   ]),
 };
 
@@ -428,8 +428,8 @@ export const partialAuditDemo: DigitalPresenceReport = {
   methodology: sharedMethodology(
     "Approximately 58% of planned public checks had usable evidence in this demo fixture.",
     [
-      { label: "Accessible homepage sample", observedAtLabel: "Demo observation" },
-      { label: "Partial service URL set", observedAtLabel: "Demo observation" },
+      { id: "demo-src-partial-home", label: "Accessible homepage sample", observedAtLabel: "Demo observation" },
+      { id: "demo-src-partial-services", label: "Partial service URL set", observedAtLabel: "Demo observation" },
     ],
   ),
 };
@@ -578,7 +578,7 @@ export const limitedSnapshotDemo: DigitalPresenceReport = {
   ],
   methodology: sharedMethodology(
     "Approximately 22% of planned public checks had usable evidence in this demo fixture.",
-    [{ label: "Limited public profile observation", observedAtLabel: "Demo observation" }],
+    [{ id: "demo-src-limited", label: "Limited public profile observation", observedAtLabel: "Demo observation" }],
   ),
 };
 
