@@ -208,91 +208,131 @@ export function Navbar() {
   }, [pathname]);
 
   const closeMobile = () => setMobileOpen(false);
+  const openMobile = () => setMobileOpen(true);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <nav
-        aria-label="Primary"
-        className="relative mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
-      >
-        <Link
-          href="/"
-          className={cn(
-            "relative z-10 flex shrink-0 items-center",
-            "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-          )}
-          onClick={closeMobile}
+    <>
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
+        <nav
+          aria-label="Primary"
+          className="relative mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
         >
-          <SiteLogo
-            height={56}
-            priority
-            className="h-12 w-auto sm:h-14"
-          />
-        </Link>
+          <Link
+            href="/"
+            className={cn(
+              "relative z-10 flex min-w-0 shrink-0 items-center",
+              "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            )}
+            onClick={closeMobile}
+          >
+            <SiteLogo
+              height={56}
+              priority
+              className="h-12 w-auto max-w-[min(100%,11rem)] sm:h-14 sm:max-w-none"
+            />
+          </Link>
 
-        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-0.5 xl:gap-1 lg:flex">
-          {mainNav.map((item) => (
-            <li key={item.href}>
-              <NavLink
-                item={item}
-                pathname={pathname}
-                hash={hash}
-                activeSectionId={activeSectionId}
-                onNavigate={closeMobile}
-              />
-            </li>
-          ))}
-        </ul>
+          <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-0.5 xl:gap-1 lg:flex">
+            {mainNav.map((item) => (
+              <li key={item.href}>
+                <NavLink
+                  item={item}
+                  pathname={pathname}
+                  hash={hash}
+                  activeSectionId={activeSectionId}
+                  onNavigate={closeMobile}
+                />
+              </li>
+            ))}
+          </ul>
 
-        <div className="flex shrink-0 items-center gap-2">
-          <CtaLink className="hidden lg:inline-flex" />
+          <div className="flex shrink-0 items-center gap-2">
+            <CtaLink className="hidden lg:inline-flex" />
+
+            <button
+              type="button"
+              className={cn(
+                "inline-flex size-10 cursor-pointer items-center justify-center rounded-lg border border-border text-foreground lg:hidden",
+                "transition-colors hover:bg-muted",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              )}
+              aria-expanded={mobileOpen}
+              aria-controls={menuId}
+              aria-label="Open menu"
+              onClick={openMobile}
+            >
+              <Menu className="size-5" aria-hidden="true" />
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <div
+        id={menuId}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation"
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen ? true : undefined}
+        className={cn(
+          "fixed inset-0 z-[60] flex h-dvh w-full flex-col bg-background lg:hidden",
+          "transition-transform duration-300 ease-out motion-reduce:transition-none",
+          mobileOpen ? "translate-x-0" : "translate-x-full pointer-events-none",
+        )}
+      >
+        <div className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border px-4 sm:px-6">
+          <Link
+            href="/"
+            className={cn(
+              "flex min-w-0 items-center",
+              "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            )}
+            onClick={closeMobile}
+          >
+            <SiteLogo
+              height={56}
+              className="h-12 w-auto max-w-[min(100%,11rem)] sm:h-14 sm:max-w-none"
+            />
+          </Link>
 
           <button
             type="button"
             className={cn(
-              "inline-flex size-10 cursor-pointer items-center justify-center rounded-lg border border-border text-foreground lg:hidden",
+              "inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border text-foreground",
               "transition-colors hover:bg-muted",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             )}
-            aria-expanded={mobileOpen}
-            aria-controls={menuId}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMobileOpen((open) => !open)}
+            aria-label="Close menu"
+            onClick={closeMobile}
           >
-            {mobileOpen ? (
-              <X className="size-5" aria-hidden="true" />
-            ) : (
-              <Menu className="size-5" aria-hidden="true" />
-            )}
+            <X className="size-5" aria-hidden="true" />
           </button>
         </div>
-      </nav>
 
-      <div
-        id={menuId}
-        className={cn(
-          "border-t border-border bg-background lg:hidden",
-          !mobileOpen && "hidden",
-        )}
-      >
-        <ul className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4 sm:px-6">
-          {mainNav.map((item) => (
-            <li key={`mobile-${item.href}`}>
-              <NavLink
-                item={item}
-                pathname={pathname}
-                hash={hash}
-                activeSectionId={activeSectionId}
-                onNavigate={closeMobile}
-                className="block w-full"
-              />
-            </li>
-          ))}
-          <li className="pt-2">
+        <nav
+          aria-label="Mobile"
+          className="flex min-h-0 flex-1 flex-col px-4 sm:px-6"
+        >
+          <ul className="flex flex-1 flex-col items-center justify-center gap-1 overflow-y-auto overscroll-contain py-6 text-center">
+            {mainNav.map((item) => (
+              <li key={`mobile-${item.href}`}>
+                <NavLink
+                  item={item}
+                  pathname={pathname}
+                  hash={hash}
+                  activeSectionId={activeSectionId}
+                  onNavigate={closeMobile}
+                  className="inline-flex px-3 py-3 text-base"
+                />
+              </li>
+            ))}
+          </ul>
+
+          <div className="shrink-0 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
             <CtaLink onNavigate={closeMobile} className="w-full" />
-          </li>
-        </ul>
+          </div>
+        </nav>
       </div>
-    </header>
+    </>
   );
 }
