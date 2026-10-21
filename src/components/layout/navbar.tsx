@@ -28,49 +28,73 @@ function getHashFromHref(href: string): string | null {
   return href.slice(hashIndex);
 }
 
+function sectionIdsFromNav(items: NavItem[]): string[] {
+  return items
+    .map((item) => getHashFromHref(item.href)?.replace(/^#/, ""))
+    .filter((id): id is string => Boolean(id));
+}
+
 function isNavItemActive(
   item: NavItem,
   pathname: string,
   hash: string,
+  activeSectionId: string | null,
 ): boolean {
-  if (item.href === "/") {
-    return (
-      pathname === "/" && (hash === "" || hash === "#" || hash === "#home")
-    );
+  if (pathname !== "/" && !item.isSection) {
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  }
+
+  if (pathname !== "/") {
+    return false;
   }
 
   const itemHash = getHashFromHref(item.href);
-  if (item.isSection && itemHash) {
-    return pathname === "/" && hash === itemHash;
+  const itemId = itemHash?.replace(/^#/, "") ?? null;
+
+  if (item.href === "/" || itemHash === "#home") {
+    if (activeSectionId) {
+      return activeSectionId === "home";
+    }
+    return hash === "" || hash === "#" || hash === "#home";
   }
 
-  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  if (item.isSection && itemId) {
+    if (activeSectionId) {
+      return activeSectionId === itemId;
+    }
+    return hash === `#${itemId}`;
+  }
+
+  return pathname === item.href;
 }
 
 function NavLink({
   item,
   pathname,
   hash,
+  activeSectionId,
   onNavigate,
   className,
 }: {
   item: NavItem;
   pathname: string;
   hash: string;
+  activeSectionId: string | null;
   onNavigate?: () => void;
   className?: string;
 }) {
-  const active = isNavItemActive(item, pathname, hash);
+  const active = isNavItemActive(item, pathname, hash, activeSectionId);
 
   return (
     <Link
       href={item.href}
       onClick={onNavigate}
       className={cn(
-        "rounded-md px-3 py-2 text-sm font-medium text-foreground/70 transition-colors",
+        "rounded-md px-3 py-2 text-sm text-foreground/70 transition-colors",
         "hover:text-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        active && "text-foreground underline decoration-foreground/40 underline-offset-8",
+        "no-underline",
+        active ? "font-bold text-foreground" : "font-medium",
         className,
       )}
       aria-current={active ? "page" : undefined}
@@ -92,7 +116,7 @@ function CtaLink({
       href={primaryCta.href}
       onClick={onNavigate}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground",
+        "inline-flex cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground",
         "transition-colors hover:bg-primary/90",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
@@ -112,11 +136,13 @@ export function Navbar() {
   );
   const [mobileOpen, setMobileOpen] = useState(false);
   const [prevPathname, setPrevPathname] = useState(pathname);
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const menuId = useId();
 
   if (pathname !== prevPathname) {
     setPrevPathname(pathname);
     if (mobileOpen) setMobileOpen(false);
+    if (activeSectionId !== null) setActiveSectionId(null);
   }
 
   useEffect(() => {
@@ -145,11 +171,43 @@ export function Navbar() {
     return () => media.removeEventListener("change", onChange);
   }, []);
 
-  const closeMobile = () => setMobileOpen(false);
+  useEffect(() => {
+    if (pathname !== "/") return;
 
-  const handleSectionNavigate = () => {
-    closeMobile();
-  };
+    const ids = ["home", ...sectionIdsFromNav(mainNav)];
+    const uniqueIds = [...new Set(ids)];
+    const elements = uniqueIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0),
+          );
+        const top = visible[0]?.target;
+        if (top?.id) {
+          setActiveSectionId(top.id);
+        }
+      },
+      {
+        root: null,
+        // Account for sticky header; prefer the section near the top third.
+        rootMargin: "-20% 0px -55% 0px",
+        threshold: [0.1, 0.25, 0.5],
+      },
+    );
+
+    for (const el of elements) observer.observe(el);
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  const closeMobile = () => setMobileOpen(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
@@ -172,14 +230,15 @@ export function Navbar() {
           />
         </Link>
 
-        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
+        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-0.5 xl:gap-1 lg:flex">
           {mainNav.map((item) => (
             <li key={item.href}>
               <NavLink
                 item={item}
                 pathname={pathname}
                 hash={hash}
-                onNavigate={item.isSection ? handleSectionNavigate : undefined}
+                activeSectionId={activeSectionId}
+                onNavigate={closeMobile}
               />
             </li>
           ))}
@@ -191,7 +250,7 @@ export function Navbar() {
           <button
             type="button"
             className={cn(
-              "inline-flex size-10 items-center justify-center rounded-lg border border-border text-foreground lg:hidden",
+              "inline-flex size-10 cursor-pointer items-center justify-center rounded-lg border border-border text-foreground lg:hidden",
               "transition-colors hover:bg-muted",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             )}
@@ -223,9 +282,8 @@ export function Navbar() {
                 item={item}
                 pathname={pathname}
                 hash={hash}
-                onNavigate={
-                  item.isSection ? handleSectionNavigate : closeMobile
-                }
+                activeSectionId={activeSectionId}
+                onNavigate={closeMobile}
                 className="block w-full"
               />
             </li>

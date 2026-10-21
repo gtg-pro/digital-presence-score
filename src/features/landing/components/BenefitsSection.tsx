@@ -4,7 +4,7 @@ import { benefits } from "@/features/landing/data/benefits";
 export function BenefitsSection() {
   return (
     <section
-      id="benefits"
+      id="why-it-matters"
       aria-labelledby="benefits-heading"
       className="border-b border-border bg-background"
     >

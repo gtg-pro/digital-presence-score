@@ -149,7 +149,7 @@ export function AuditProgressPage({
               </Button>
             ) : null}
             <Link
-              href="/audit"
+              href="/#home"
               className="inline-flex items-center justify-center rounded-lg border border-foreground bg-background px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
             >
               Back to audit form

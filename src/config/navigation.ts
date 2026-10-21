@@ -7,27 +7,30 @@ export type NavItem = {
 
 /**
  * Primary marketing navigation.
- * Section hrefs target landing anchors for smooth scrolling once sections exist.
+ * Section hrefs target landing anchors for smooth scrolling.
  */
 export const mainNav: NavItem[] = [
   { label: "Home", href: "/", isSection: false },
-  { label: "How It Works", href: "/#how-it-works", isSection: true },
-  { label: "What We Check", href: "/#what-we-check", isSection: true },
+  { label: "Process", href: "/#how-it-works", isSection: true },
+  { label: "Criteria", href: "/#what-we-check", isSection: true },
+  { label: "Importance", href: "/#why-it-matters", isSection: true },
   { label: "Sample Report", href: "/#sample-report", isSection: true },
   { label: "FAQs", href: "/#faqs", isSection: true },
 ];
 
+/** Top-right navbar button (black) — scrolls to footer contact CTA. */
 export const primaryCta = {
-  label: "Get Free Report Card",
-  href: "/audit",
+  label: "Contact",
+  href: "/#contact",
 } as const;
 
 export const footerQuickLinks: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "How It Works", href: "/#how-it-works", isSection: true },
   { label: "What We Check", href: "/#what-we-check", isSection: true },
+  { label: "Why It Matters", href: "/#why-it-matters", isSection: true },
   { label: "Sample Report", href: "/#sample-report", isSection: true },
-  { label: "Get Free Report Card", href: "/audit" },
+  { label: "Contact", href: "/#contact", isSection: true },
 ];
 
 export const footerResourceLinks: NavItem[] = [
@@ -43,8 +46,11 @@ export const footerLegalLinks: NavItem[] = [
 ];
 
 export const footerCta = {
-  heading: "Ready to understand your digital presence?",
-  description: "Discover where your business stands and what you can improve.",
-  label: "Get My Free Report",
-  href: "/audit",
+  heading: "Ready to see how your business performs online?",
+  description:
+    "Get a clear digital-presence assessment with practical findings and recommendations based on available public evidence for your business.",
+  label: "Get My Free Report Card",
+  href: "/#home",
+  secondaryLabel: "See How It Works",
+  secondaryHref: "/#how-it-works",
 } as const;

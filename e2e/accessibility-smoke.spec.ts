@@ -7,17 +7,21 @@ test.describe("accessibility and responsive smoke", () => {
     await page.goto("/");
     await expect(page.getByRole("banner").first()).toBeVisible();
     await expect(page.locator("main, #main-content, [role='main']").first()).toBeVisible();
-    const cta = page.getByRole("link", { name: /get free report card/i }).first();
-    await cta.focus();
-    await expect(cta).toBeFocused();
+    const contact = page
+      .getByRole("navigation", { name: /primary/i })
+      .getByRole("link", { name: /^contact$/i });
+    await contact.focus();
+    await expect(contact).toBeFocused();
   });
 
-  test("audit form labels are associated", async ({ page }) => {
-    await page.goto("/audit");
+  test("homepage audit URL field is labeled for assistive tech", async ({
+    page,
+  }) => {
+    await page.goto("/");
     const url = page.getByLabel(/website url/i);
     await expect(url).toBeVisible();
-    await page.locator("#agreeToTerms").focus();
-    await expect(page.locator("#agreeToTerms")).toBeFocused();
+    await url.focus();
+    await expect(url).toBeFocused();
   });
 
   test("progress page exposes live region status", async ({ page }, testInfo) => {
@@ -29,12 +33,10 @@ test.describe("accessibility and responsive smoke", () => {
     await expect(page.getByRole("status").first()).toBeVisible();
   });
 
-  test("demo report headings are semantic", async ({ page }) => {
-    await page.goto("/report/demo-complete");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    // In-report Sample Report badge (not the site nav link).
+  test("landing sample report preview is present", async ({ page }) => {
+    await page.goto("/#sample-report");
     await expect(
-      page.locator("#main-content").getByText("Sample Report", { exact: true }),
+      page.locator("#sample-report").getByText("Sample Report", { exact: true }),
     ).toBeVisible();
   });
 

@@ -22,8 +22,8 @@ export function StrategyCallCTA() {
         scheduling are not offered here.
       </p>
       <Link
-        href="/audit"
-        className="mt-6 inline-flex h-12 items-center justify-center rounded-lg bg-background px-6 text-sm font-medium text-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+        href="/#home"
+        className="mt-6 inline-flex h-12 cursor-pointer items-center justify-center rounded-lg bg-background px-6 text-sm font-medium text-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
       >
         Start a new assessment
       </Link>

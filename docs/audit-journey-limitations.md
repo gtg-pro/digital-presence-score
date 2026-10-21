@@ -8,7 +8,13 @@ Verified against the Prompt 21–24 implementation.
 - **No email delivery** of reports.
 - **No Admin / Super Admin dashboard.**
 - **No background job queues** (Redis, workers, etc.).
+- **No website-less / business-details-only audit path** — assessments start from the homepage URL field only (`/audit` redirects home).
 - **Live OpenAI / Google PageSpeed connectivity** is configured via env vars but was **not verified** in the automated Prompt 23–24 QA pass (CI uses mocked/fixture boundaries).
+
+## Local vs production parity
+
+- Match Production env vars to local: `GOOGLE_PAGESPEED_API_KEY`, `OPENAI_API_KEY`, `REPORT_SESSION_SECRET`. Do not set `AUDIT_SKIP_PAGESPEED` / `AUDIT_SKIP_OPENAI` in Production.
+- Same URL can still differ slightly when local Playwright Chromium vs serverless `@sparticuz/chromium` extract different DOM, or when PageSpeed/OpenAI is available in one environment only.
 
 ## Streaming
 

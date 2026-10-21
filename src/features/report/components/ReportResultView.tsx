@@ -30,16 +30,6 @@ export function ReportResultView({
     <Container className="py-10 sm:py-14 lg:py-16">
       <div className="mx-auto max-w-5xl space-y-10">
         <ReportHeader report={report} showDemoBadge={!live && report.isDemo} />
-        {live ? (
-          <p
-            role="note"
-            className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground"
-          >
-            This is a live assessment result held in a short-lived encrypted
-            browser session (about 30 minutes). It is not permanently stored,
-            emailed, or publicly shareable.
-          </p>
-        ) : null}
         <OverallScore report={report} />
         {report.outcome !== "limited" ? (
           <CategoryBreakdown report={report} />

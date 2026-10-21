@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { Container } from "@/components/ui/container";
 
 import { WebsiteUrlInput } from "./WebsiteUrlInput";
@@ -31,21 +29,7 @@ export function HeroSection() {
           <p className="mt-3 text-sm text-muted-foreground">
             A public digital-presence assessment. No login required.
           </p>
-
-          <p className="mt-2 text-sm">
-            <Link
-              href="/audit"
-              className="font-medium text-foreground underline decoration-foreground/30 underline-offset-4 transition-colors hover:decoration-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm"
-            >
-              Don&apos;t have a website? Start with business details
-            </Link>
-          </p>
         </div>
-
-        <p className="mt-6 max-w-xl text-xs leading-relaxed text-muted-foreground sm:mt-8 sm:text-sm">
-          This assessment evaluates publicly observable digital presence, not
-          actual service quality or official search-engine rankings.
-        </p>
       </Container>
     </section>
   );

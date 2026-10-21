@@ -112,11 +112,8 @@ export async function POST(request: Request): Promise<Response> {
       : null;
   const bodyHasInputs = Boolean(
     bodyRecord &&
-      ((typeof bodyRecord.websiteUrl === "string" &&
-        bodyRecord.websiteUrl.trim()) ||
-        (typeof bodyRecord.businessName === "string" &&
-          bodyRecord.businessName.trim()) ||
-        bodyRecord.entryMode === "minimal"),
+      typeof bodyRecord.websiteUrl === "string" &&
+      bodyRecord.websiteUrl.trim(),
   );
   const source = bodyHasInputs ? bodyJson : (pending ?? bodyJson);
   if (!source) {

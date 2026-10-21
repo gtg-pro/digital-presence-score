@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowUpRight, CheckCircle2, CircleAlert, Download } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -246,29 +245,27 @@ export function SampleReportCard({
 
       {showActions ? (
         <CardFooter>
-          <Link
-            href={`/report/${report.id}`}
+          {/* Decorative only — sample card actions are non-interactive visuals. */}
+          <span
+            aria-hidden="true"
             className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground",
-              "transition-colors hover:bg-primary/90",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "inline-flex h-11 select-none items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground",
+              "pointer-events-none",
             )}
           >
             View Sample Report
             <ArrowUpRight className="size-4" aria-hidden="true" />
-          </Link>
-          <a
-            href={`/api/report/${encodeURIComponent(report.id)}/pdf`}
+          </span>
+          <span
+            aria-hidden="true"
             className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-background px-5 text-sm font-medium text-foreground",
-              "transition-colors hover:bg-muted",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "inline-flex h-11 select-none items-center justify-center gap-2 rounded-lg border border-border bg-background px-5 text-sm font-medium text-foreground",
+              "pointer-events-none",
             )}
-            aria-label="Download sample PDF"
           >
             <Download className="size-4" aria-hidden="true" />
             Download PDF
-          </a>
+          </span>
         </CardFooter>
       ) : null}
     </Card>

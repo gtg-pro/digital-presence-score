@@ -1,19 +1,17 @@
 import { expect, test, type Page } from "@playwright/test";
 
-async function submitAuditForm(page: Page, websiteUrl: string) {
-  await page.goto("/audit");
-  await page.getByLabel(/website url/i).fill(websiteUrl);
-  await page.locator("#agreeToTerms").check();
-  await page.getByRole("button", { name: /start my assessment/i }).click();
+async function submitHomepageAudit(page: Page, websiteUrl: string) {
+  await page.goto("/");
+  await page.getByPlaceholder(/example-service/i).fill(websiteUrl);
+  await page.getByRole("button", { name: /get my free report/i }).click();
   await expect(page).toHaveURL(/\/audit\/progress/);
 }
 
 async function waitForLiveReport(page: Page) {
   await page.waitForURL(/\/report\/live-/, { timeout: 90_000 });
-  await expect(
-    page.getByText(/live assessment result held in a short-lived encrypted/i),
-  ).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible({
+    timeout: 30_000,
+  });
 }
 
 test.describe("Prompt 23 end-to-end audit journey", () => {
@@ -131,13 +129,13 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
     await expect(page.getByRole("button", { name: /download png/i })).toBeEnabled();
   });
 
-  test("audit form submission reaches live report", async ({ page }, testInfo) => {
+  test("homepage audit submission reaches live report", async ({ page }, testInfo) => {
     test.skip(
       testInfo.project.name !== "chromium-desktop",
-      "Form path covered on desktop",
+      "Homepage path covered on desktop",
     );
 
-    await submitAuditForm(page, "https://example.com");
+    await submitHomepageAudit(page, "https://example.com");
     await waitForLiveReport(page);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
@@ -146,13 +144,18 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "desktop only");
+    await page.goto("/");
+    await page.getByPlaceholder(/example-service/i).fill("not a url");
+    await page.getByRole("button", { name: /get my free report/i }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole("alert")).toContainText(/valid website url/i);
+  });
+
+  test("retired /audit page redirects to homepage", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "desktop only");
     await page.goto("/audit");
-    await page.getByLabel(/website url/i).fill("not a url");
-    await page.locator("#agreeToTerms").check();
-    await page.getByRole("button", { name: /start my assessment/i }).click();
-    await expect(page).toHaveURL(/\/audit$/);
-    await expect(page.locator("#websiteUrl-error")).toBeVisible();
-    await expect(page.locator("#websiteUrl-error")).toContainText(/valid website url/i);
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByPlaceholder(/example-service/i)).toBeVisible();
   });
 
   test("PARTIAL and LIMITED fixtures complete via SSE API", async ({

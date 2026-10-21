@@ -6,7 +6,12 @@ import { faqs } from "@/features/landing/data/faqs";
 import { sampleReport } from "@/features/report/data/sample-report";
 import { reportDemoFixtures } from "@/features/report/data/report.mock";
 import { mapAssessmentToReport } from "@/features/report/adapters/assessment-to-report";
-import { footerQuickLinks, mainNav, primaryCta } from "@/config/navigation";
+import {
+  footerCta,
+  footerQuickLinks,
+  mainNav,
+  primaryCta,
+} from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 import { runAssessment } from "@/lib/audit/orchestration/assessment";
 import {
@@ -174,7 +179,17 @@ describe("Prompt 22 — accurate public claims", () => {
   });
 
   it("primary CTAs point to real destinations", () => {
-    expect(primaryCta.href).toBe("/audit");
+    expect(primaryCta.href).toBe("/#contact");
+    expect(primaryCta.label).toBe("Contact");
+    expect(footerCta.href).toBe("/#home");
+    expect(footerCta.label).toBe("Get My Free Report Card");
+    expect(mainNav.some((item) => item.href === "/#why-it-matters")).toBe(true);
+    expect(
+      mainNav.findIndex((item) => item.href === "/#why-it-matters"),
+    ).toBeLessThan(
+      mainNav.findIndex((item) => item.href === "/#sample-report"),
+    );
+    expect(mainNav.some((item) => item.label === "Contact")).toBe(false);
     for (const item of mainNav) {
       expect(item.href).not.toBe("#");
       expect(item.href.length).toBeGreaterThan(0);
@@ -182,6 +197,21 @@ describe("Prompt 22 — accurate public claims", () => {
     for (const item of footerQuickLinks) {
       expect(item.href).not.toBe("#");
     }
+  });
+
+  it("black contact CTA lives at the top of the footer, not as a mid-page section", () => {
+    const footer = readFileSync(
+      path.join(root, "src/components/layout/site-footer.tsx"),
+      "utf8",
+    );
+    const marketing = readFileSync(
+      path.join(root, "src/app/(marketing)/page.tsx"),
+      "utf8",
+    );
+    expect(footer).toContain('id="contact"');
+    expect(footer).toContain("footerCta");
+    expect(footer).toContain("bg-foreground");
+    expect(marketing).not.toContain("PrimaryCTASection");
   });
 
   it("ReportActions source no longer offers inert email/share controls", () => {
@@ -195,12 +225,12 @@ describe("Prompt 22 — accurate public claims", () => {
     expect(source).toContain("Download PNG");
   });
 
-  it("Strategy CTA links to /audit instead of a fake booking control", () => {
+  it("Strategy CTA links to homepage audit entry instead of a fake booking control", () => {
     const source = readFileSync(
       path.join(root, "src/features/report/components/StrategyCallCTA.tsx"),
       "utf8",
     );
-    expect(source).toContain('href="/audit"');
+    expect(source).toContain('href="/#home"');
     expect(source).not.toContain("Book a Strategy Call");
     expect(source).not.toContain("disabled");
   });

@@ -334,10 +334,80 @@ describe("coverage and outcomes", () => {
       1,
       ["website_experience", "local_seo_presence"],
     );
-    // applicable weight = 6+7=13, assessed = 6 → ~0.46
-    expect(report.applicableEffectiveWeight).toBe(13);
+    // Provider-gap NOT_ASSESSED (measured_performance) is excluded from the
+    // coverage pool. NOT_APPLICABLE discovery is also excluded.
+    // Pool weight = 6 (mobile only), assessed = 6 → 1.0
+    expect(report.applicableEffectiveWeight).toBe(6);
     expect(report.assessedEffectiveWeight).toBe(6);
-    expect(report.weightedCoverage).toBe(roundPoints(6 / 13));
+    expect(report.weightedCoverage).toBe(1);
+  });
+
+  it("varies coverage when website-signal criteria stay NOT_ASSESSED", () => {
+    const criteria: ScoredCriterion[] = [
+      {
+        criterionId: "WE.mobile_usability",
+        categoryId: "website_experience",
+        scoringVersion: "strict-v1.0",
+        name: "Mobile",
+        baseMaxPoints: 6,
+        effectiveMaxPoints: 6,
+        assessment: "PASS",
+        applicability: "APPLICABLE",
+        earnedPoints: 6,
+        evidenceIds: ["page-1"],
+        sourceUrls: [],
+        observationTimestamps: [],
+        scoringRuleId: "x",
+        rationale: "x",
+        observationFingerprint: null,
+      },
+      {
+        criterionId: "WE.design_readability",
+        categoryId: "website_experience",
+        scoringVersion: "strict-v1.0",
+        name: "Readability",
+        baseMaxPoints: 4,
+        effectiveMaxPoints: 4,
+        assessment: "NOT_ASSESSED",
+        applicability: "APPLICABLE",
+        earnedPoints: null,
+        evidenceIds: [],
+        sourceUrls: [],
+        observationTimestamps: [],
+        scoringRuleId: "x",
+        rationale: "No page available for readability assessment.",
+        observationFingerprint: null,
+      },
+      {
+        criterionId: "WE.measured_performance",
+        categoryId: "website_experience",
+        scoringVersion: "strict-v1.0",
+        name: "Perf",
+        baseMaxPoints: 7,
+        effectiveMaxPoints: 7,
+        assessment: "NOT_ASSESSED",
+        applicability: "APPLICABLE",
+        earnedPoints: null,
+        evidenceIds: [],
+        sourceUrls: [],
+        observationTimestamps: [],
+        scoringRuleId: "x",
+        rationale: "PageSpeed unavailable",
+        observationFingerprint: null,
+      },
+    ];
+
+    const report = calculateCoverage(
+      criteria,
+      SCORING_CONFIG_STRICT_V1.coverage,
+      1,
+      ["website_experience"],
+    );
+    // Pool = mobile(6) + readability(4) = 10; assessed = 6 → 0.6
+    // PageSpeed provider gap excluded so coverage reflects website evidence.
+    expect(report.applicableEffectiveWeight).toBe(10);
+    expect(report.assessedEffectiveWeight).toBe(6);
+    expect(report.weightedCoverage).toBe(roundPoints(6 / 10));
   });
 });
 

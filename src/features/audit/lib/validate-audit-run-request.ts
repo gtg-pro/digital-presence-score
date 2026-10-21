@@ -27,25 +27,26 @@ export function validateAuditRunRequest(
   }
 
   const raw = input as Record<string, unknown>;
-  const entryMode = raw.entryMode === "minimal" ? "minimal" : "url";
+  // Minimal / no-website entry is retired — website URL audits only.
+  if (raw.entryMode === "minimal") {
+    return {
+      ok: false,
+      code: "invalid_input",
+      message:
+        "Website URL is required. The business-details-only path is no longer available.",
+    };
+  }
+  const entryMode = "url" as const;
   const websiteUrl =
     typeof raw.websiteUrl === "string" ? raw.websiteUrl.trim() : "";
   const businessName =
     typeof raw.businessName === "string" ? raw.businessName.trim() : "";
 
-  if (entryMode === "url") {
-    if (!websiteUrl) {
-      return {
-        ok: false,
-        code: "invalid_input",
-        message: "Website URL is required.",
-      };
-    }
-  } else if (!websiteUrl && !businessName) {
+  if (!websiteUrl) {
     return {
       ok: false,
       code: "invalid_input",
-      message: "Provide a business name or website URL to continue.",
+      message: "Website URL is required.",
     };
   }
 
@@ -87,7 +88,7 @@ export function validateAuditRunRequest(
 
   return {
     ok: true,
-    allowMissingWebsite: entryMode === "minimal" && !normalizedWebsiteUrl,
+    allowMissingWebsite: false,
     normalizedWebsiteUrl,
     body: {
       websiteUrl: normalizedWebsiteUrl,

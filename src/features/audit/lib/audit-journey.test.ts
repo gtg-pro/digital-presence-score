@@ -96,14 +96,14 @@ describe("validateAuditRunRequest", () => {
     if (!result.ok) expect(result.code).toBe("unsafe_url");
   });
 
-  it("allows minimal path without website", () => {
+  it("rejects retired minimal path without website", () => {
     const result = validateAuditRunRequest({
       websiteUrl: "",
       businessName: "Remote Studio",
       entryMode: "minimal",
     });
-    expect(result.ok).toBe(true);
-    if (result.ok) expect(result.allowMissingWebsite).toBe(true);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("invalid_input");
   });
 });
 
