@@ -30,9 +30,9 @@ export function FAQSection() {
             </p>
 
             <p className="mt-6 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-              Answers describe the intended product experience. Scanning,
-              downloadable exports, email delivery, and sharing are not active
-              in this frontend preview.
+              Answers reflect the current product: live assessments, on-screen
+              reports, and PDF/PNG downloads. Email delivery and public sharing
+              are not available.
             </p>
           </div>
 

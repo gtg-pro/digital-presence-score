@@ -1,5 +1,9 @@
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
+/**
+ * Honest next-step CTA — no invented booking destinations or strategy-call
+ * integrations. Points users back to a real assessment start.
+ */
 export function StrategyCallCTA() {
   return (
     <section
@@ -10,24 +14,19 @@ export function StrategyCallCTA() {
         id="strategy-call-heading"
         className="font-display text-2xl font-medium tracking-tight sm:text-3xl"
       >
-        Ready to turn these insights into action?
+        Ready to measure again after you make changes?
       </h2>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-background/75 sm:text-base">
-        Discuss your results and explore practical ways to strengthen your
-        business&apos;s digital presence.
+        Use the prioritized recommendations in this report, then run a fresh
+        assessment whenever you want an updated snapshot. Booking and advisory
+        scheduling are not offered here.
       </p>
-      <Button
-        type="button"
-        disabled
-        className="mt-6 h-12 border-0 bg-background px-6 text-foreground hover:bg-background disabled:cursor-not-allowed disabled:opacity-60"
-        title="Booking destination will be finalized later"
-        aria-label="Book a strategy call (placeholder — not connected)"
+      <Link
+        href="/audit"
+        className="mt-6 inline-flex h-12 items-center justify-center rounded-lg bg-background px-6 text-sm font-medium text-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
       >
-        Book a Strategy Call
-      </Button>
-      <p className="mt-3 text-xs text-background/60">
-        Booking is not connected in this frontend preview.
-      </p>
+        Start a new assessment
+      </Link>
     </section>
   );
 }

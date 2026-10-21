@@ -38,17 +38,20 @@ export type AuditProgressStageState = {
 };
 
 /**
- * Progress snapshot shaped for future API integration.
+ * Progress snapshot for live runs and demo previews.
  * Never includes fabricated numerical scores.
  */
 export type AuditProgressSnapshot = {
   id: string;
-  isDemo: true;
+  isDemo: boolean;
   label: string;
   outcome: AuditOverallOutcome;
   headline: string;
   summary: string;
   stages: AuditProgressStageState[];
+  /** User-facing technical error (not PARTIAL/LIMITED). */
+  errorMessage?: string;
+  retryable?: boolean;
 };
 
 export type AuditDemoStateKey =

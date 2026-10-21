@@ -1,0 +1,191 @@
+{
+  "strongCompleteAudit": {
+    "ok": true,
+    "status": "COMPLETE",
+    "scoringVersion": "strict-v1.0",
+    "assessedAt": "2026-10-21T06:00:00.000Z",
+    "businessModel": "local_service",
+    "totalScore": 80.8,
+    "totalMaxPoints": 100,
+    "pointsEarned": 80.8,
+    "pointsAssessedCeiling": 87,
+    "pointsUnassessed": 13,
+    "maturity": {
+      "band": "growing_digital_presence",
+      "label": "Growing Digital Presence",
+      "eligible": true,
+      "reason": "Score 80.8 maps to Growing Digital Presence."
+    },
+    "coverage": {
+      "weightedCoverage": 0.87,
+      "assessedEffectiveWeight": 87,
+      "applicableEffectiveWeight": 100,
+      "categoriesWithAssessedEvidence": [
+        "website_experience",
+        "local_seo_presence",
+        "reputation_trust",
+        "content_authority",
+        "conversion_readiness"
+      ],
+      "categoriesMissingAssessedEvidence": [],
+      "verifiedWebsitePages": 3,
+      "meetsPublicationThresholds": true
+    },
+    "unavailableChecks": [
+      "SEO.discovery_profiles",
+      "REP.third_party_reviews"
+    ],
+    "notApplicableChecks": [],
+    "rejectedAiFindingIds": [
+      "bad"
+    ],
+    "policyFlags": [
+      "unassessed_weight_uses_absolute_points_earned",
+      "reputation_provider_unavailable"
+    ],
+    "unresolvedPolicyNotes": [
+      "strict-v1.0 publishes absolute points earned on the 100-point scale without extrapolating unassessed weight to 100 and without treating NOT_ASSESSED as FAIL/zero. Product may later specify an alternate aggregation formula."
+    ],
+    "categoryTotals": [
+      {
+        "categoryId": "website_experience",
+        "maxPoints": 25,
+        "earnedPoints": 25,
+        "assessedEffectiveWeight": 25,
+        "unassessedEffectiveWeight": 0
+      },
+      {
+        "categoryId": "local_seo_presence",
+        "maxPoints": 25,
+        "earnedPoints": 20,
+        "assessedEffectiveWeight": 20,
+        "unassessedEffectiveWeight": 5
+      },
+      {
+        "categoryId": "reputation_trust",
+        "maxPoints": 20,
+        "earnedPoints": 9,
+        "assessedEffectiveWeight": 12,
+        "unassessedEffectiveWeight": 8
+      },
+      {
+        "categoryId": "content_authority",
+        "maxPoints": 15,
+        "earnedPoints": 12,
+        "assessedEffectiveWeight": 15,
+        "unassessedEffectiveWeight": 0
+      },
+      {
+        "categoryId": "conversion_readiness",
+        "maxPoints": 15,
+        "earnedPoints": 14.8,
+        "assessedEffectiveWeight": 15,
+        "unassessedEffectiveWeight": 0
+      }
+    ],
+    "criteriaSample": [
+      {
+        "criterionId": "WE.mobile_usability",
+        "assessment": "PASS",
+        "applicability": "APPLICABLE",
+        "baseMaxPoints": 6,
+        "effectiveMaxPoints": 6,
+        "earnedPoints": 6,
+        "evidenceIds": [
+          "page-1"
+        ],
+        "scoringRuleId": "rule.WE.mobile_usability.v1",
+        "rationale": "Homepage exposes multiple internal navigation links and at least one CTA; no corroborated mobile/navigation weakness."
+      },
+      {
+        "criterionId": "WE.measured_performance",
+        "assessment": "PASS",
+        "applicability": "APPLICABLE",
+        "baseMaxPoints": 7,
+        "effectiveMaxPoints": 7,
+        "earnedPoints": 7,
+        "evidenceIds": [
+          "pagespeed-mobile-1"
+        ],
+        "scoringRuleId": "rule.WE.measured_performance.v1",
+        "rationale": "Lighthouse performance score 92 indicates strong measured performance."
+      },
+      {
+        "criterionId": "WE.design_readability",
+        "assessment": "PASS",
+        "applicability": "APPLICABLE",
+        "baseMaxPoints": 4,
+        "effectiveMaxPoints": 4,
+        "earnedPoints": 4,
+        "evidenceIds": [
+          "page-1"
+        ],
+        "scoringRuleId": "rule.WE.design_readability.v1",
+        "rationale": "Clear H1 and substantial body text without corroborated readability weaknesses."
+      },
+      {
+        "criterionId": "WE.structural_clarity",
+        "assessment": "PASS",
+        "applicability": "APPLICABLE",
+        "baseMaxPoints": 4,
+        "effectiveMaxPoints": 4,
+        "earnedPoints": 4,
+        "evidenceIds": [
+          "page-1"
+        ],
+        "scoringRuleId": "rule.WE.structural_clarity.v1",
+        "rationale": "Multiple internal links and discovered service pages indicate structural clarity."
+      },
+      {
+        "criterionId": "WE.business_service_info",
+        "assessment": "PASS",
+        "applicability": "APPLICABLE",
+        "baseMaxPoints": 4,
+        "effectiveMaxPoints": 4,
+        "earnedPoints": 4,
+        "evidenceIds": [
+          "page-1"
+        ],
+        "scoringRuleId": "rule.WE.business_service_info.v1",
+        "rationale": "Service offering and contact pathway are transparent; service-area or remote context acknowledged."
+      }
+    ],
+    "note": "Sanitized controlled-fixture scoring output. No API keys. Demo report data unchanged."
+  },
+  "missingPageSpeed": {
+    "status": "COMPLETE",
+    "totalScore": 73.8,
+    "measuredPerformance": {
+      "criterionId": "WE.measured_performance",
+      "categoryId": "website_experience",
+      "scoringVersion": "strict-v1.0",
+      "name": "Measured performance",
+      "baseMaxPoints": 7,
+      "effectiveMaxPoints": 7,
+      "assessment": "NOT_ASSESSED",
+      "applicability": "APPLICABLE",
+      "earnedPoints": null,
+      "evidenceIds": [],
+      "sourceUrls": [],
+      "observationTimestamps": [],
+      "scoringRuleId": "rule.WE.measured_performance.v1",
+      "rationale": "PageSpeed evidence unavailable; measured performance is NOT_ASSESSED (not FAIL).",
+      "observationFingerprint": "we.perf.missing"
+    },
+    "unavailableChecks": [
+      "WE.measured_performance",
+      "SEO.discovery_profiles",
+      "REP.third_party_reviews"
+    ]
+  },
+  "limitedVisibility": {
+    "status": "LIMITED_VISIBILITY",
+    "totalScore": null,
+    "maturity": {
+      "band": null,
+      "label": null,
+      "eligible": false,
+      "reason": "No maturity band for limited visibility snapshot."
+    }
+  }
+}

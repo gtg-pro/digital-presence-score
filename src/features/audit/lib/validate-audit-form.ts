@@ -91,11 +91,6 @@ export function validateAuditForm(values: AuditFormValues): AuditFormErrors {
     errors.email = "Enter a valid email address, or leave this field blank.";
   }
 
-  if (values.receiveReportByEmail && !values.email.trim()) {
-    errors.email =
-      "Add an email address to receive your report, or uncheck email delivery.";
-  }
-
   if (!values.agreeToTerms) {
     errors.agreeToTerms = "You must agree to the assessment terms to continue.";
   }

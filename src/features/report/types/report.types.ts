@@ -30,6 +30,10 @@ export type ReportCategoryFinding = {
   title: string;
   detail: string;
   evidenceId?: string;
+  /** Safe http(s) source URL when available */
+  evidenceUrl?: string | null;
+  observedAtLabel?: string;
+  collectionMethod?: string;
 };
 
 export type ReportCategoryResult = {
@@ -86,12 +90,13 @@ export type ReportMethodology = {
 };
 
 /**
- * Full report card model for future API integration.
+ * Full report card model for demo fixtures and live AssessmentResult mapping.
  * `overallScore` / `maturityBand` are null unless outcome is complete.
  */
 export type DigitalPresenceReport = {
   id: string;
-  isDemo: true;
+  /** true for illustrative fixtures only — never set for live AssessmentResult mapping */
+  isDemo: boolean;
   outcome: ReportOutcome;
   businessName: string;
   website: string | null;
@@ -111,6 +116,10 @@ export type DigitalPresenceReport = {
   actionPlan: ReportActionItem[];
   unableToVerify: UnableToVerifyItem[];
   methodology: ReportMethodology;
+  /** Preserved strict-v1.0 policy identifier when mapped from live assessment */
+  scoringPolicyId?: string | null;
+  integrationWarnings?: string[];
+  evidenceItems?: ReportEvidenceItem[];
 };
 
 export type ReportDemoKey = "complete" | "partial" | "limited";

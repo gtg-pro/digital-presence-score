@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "model": "gpt-4o-mini-2024-07-18",
+  "status": "available",
+  "industryContext": null,
+  "findingsCount": 3,
+  "validEvidenceBackedFindings": 3,
+  "overallConfidence": "high",
+  "note": "Sanitized live smoke summary — API key omitted."
+}

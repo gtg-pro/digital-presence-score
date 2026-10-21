@@ -25,9 +25,9 @@ export function ActionPlanSection({
           30-day action plan
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Prioritized checklist for this demo. Checkboxes are local UI only and
-          are not saved. Effort and impact are qualitative — not revenue
-          forecasts.
+          {report.isDemo
+            ? "Illustrative checklist for this sample report. Checkboxes are local UI only and are not saved."
+            : "Prioritized checklist from this assessment. Checkboxes are local UI only and are not saved. Effort and impact are qualitative — not revenue forecasts."}
         </p>
       </div>
 

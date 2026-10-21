@@ -56,10 +56,13 @@ export function SampleReportSection() {
             </ul>
 
             <p className="mt-8 rounded-lg border border-border bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-              The report card on the right is a{" "}
-              <span className="font-medium text-foreground">demo preview</span>{" "}
-              with illustrative scores and findings. It is not a verified
-              assessment of a real business.
+              The report card on the right is an intentional{" "}
+              <span className="font-medium text-foreground">
+                Sample Report
+              </span>{" "}
+              (illustrative example) with example scores and findings. It is not
+              a verified assessment of a real business and is separate from live
+              audit results.
             </p>
           </div>
 

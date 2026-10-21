@@ -1,0 +1,72 @@
+{
+  "ok": true,
+  "partial": false,
+  "request": {
+    "url": "https://example.com",
+    "normalizedUrl": "https://example.com/",
+    "maxPages": 20
+  },
+  "website": {
+    "seedUrl": "https://example.com",
+    "normalizedSeedUrl": "https://example.com/",
+    "homepageUrl": "https://example.com/",
+    "contactPageAvailable": "unavailable",
+    "aboutPageAvailable": "unavailable",
+    "discoveredServicePages": [
+      "https://example.com/services"
+    ],
+    "pagesCrawled": 1,
+    "pagesSkipped": 0,
+    "robotsRespected": true
+  },
+  "pages": [
+    {
+      "originalUrl": "https://example.com/",
+      "finalUrl": "https://example.com/",
+      "httpStatus": 200,
+      "title": "Acme Plumbing — Local Service Pros",
+      "metaDescription": "Licensed plumbers serving Austin. Emergency and scheduled services.",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Trusted plumbing for Austin homes"
+        },
+        {
+          "level": 2,
+          "text": "Our services"
+        }
+      ],
+      "hasStructuredData": true,
+      "structuredDataTypes": [
+        "LocalBusiness"
+      ],
+      "internalLinks": [
+        "https://example.com/services",
+        "https://example.com/about",
+        "https://example.com/contact",
+        "https://example.com/faq",
+        "https://example.com/contact"
+      ],
+      "contact": {
+        "emails": [
+          "hello@acme-plumbing.example"
+        ],
+        "phones": [
+          "(512) 555-0100"
+        ],
+        "addresses": []
+      },
+      "publicationDate": "2026-01-15T10:00:00Z",
+      "mainTextExcerpt": "Trusted plumbing for Austin homes Our services We provide drain cleaning, water heater repair, and emergency plumbing. Serving Austin and nearby service areas. Call us at (512) 555-0100 or email hello@acme-plumbing.example. Follow us on https://facebook.com/acmeplumbing Request a Quote Book Online",
+      "source": {
+        "url": "https://example.com/",
+        "observedAt": "2026-10-20T13:58:05.624Z",
+        "extractionMethod": "cheerio_html",
+        "availability": "available",
+        "confidence": 0.8
+      }
+    }
+  ],
+  "errors": [],
+  "note": "Sanitized fixture sample — not a live third-party crawl. Full typed extraction is validated in Vitest."
+}

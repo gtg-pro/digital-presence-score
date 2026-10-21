@@ -69,9 +69,9 @@ export function OverallScore({ report }: { report: DigitalPresenceReport }) {
               </p>
             ) : null}
             <p className="mt-2 text-sm text-muted-foreground">
-              Illustrative demo score only — not a verified assessment result.
-              Maturity bands are shown for UI presentation and are not computed
-              live in this frontend.
+              {report.isDemo
+                ? "Illustrative demo score only — not a verified assessment result. Maturity bands are shown for UI presentation and are not computed live in this frontend."
+                : "Score produced by the deterministic strict-v1.0 scoring engine from collected evidence. Unassessed checks are disclosed separately and are not treated as failures."}
             </p>
           </div>
         </div>

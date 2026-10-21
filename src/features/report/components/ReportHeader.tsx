@@ -2,13 +2,21 @@ import { SiteLogo } from "@/components/shared/site-logo";
 import { Badge } from "@/components/ui/badge";
 import type { DigitalPresenceReport } from "@/features/report/types/report.types";
 
-export function ReportHeader({ report }: { report: DigitalPresenceReport }) {
+export function ReportHeader({
+  report,
+  showDemoBadge,
+}: {
+  report: DigitalPresenceReport;
+  /** Defaults to report.isDemo — live reports must not show demo badges. */
+  showDemoBadge?: boolean;
+}) {
+  const demo = showDemoBadge ?? report.isDemo;
   return (
     <header className="rounded-xl border border-border bg-background p-6 shadow-sm sm:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <SiteLogo width={160} className="max-w-[10rem] sm:max-w-[12rem]" />
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="demo">Demo Report</Badge>
+          {demo ? <Badge variant="demo">Sample Report</Badge> : null}
           <Badge variant="outline">{report.statusLabel}</Badge>
         </div>
       </div>

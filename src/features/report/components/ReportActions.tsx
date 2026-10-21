@@ -1,18 +1,72 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Link2, Mail, Share2 } from "lucide-react";
+import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+
+export type ReportActionsProps = {
+  reportId: string;
+  isDemo?: boolean;
+};
 
 /**
- * Frontend placeholders only — no file generation, email, or public publishing.
+ * Report downloads hit trusted server export routes.
+ * Email and public sharing are intentionally not offered until implemented.
  */
-export function ReportActions() {
-  const [shareOptIn, setShareOptIn] = useState(false);
-  const [shareEnabled, setShareEnabled] = useState(false);
+export function ReportActions({
+  reportId,
+  isDemo = false,
+}: ReportActionsProps) {
+  const [busy, setBusy] = useState<"pdf" | "png" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function download(format: "pdf" | "png") {
+    setError(null);
+    setBusy(format);
+    try {
+      const response = await fetch(
+        `/api/report/${encodeURIComponent(reportId)}/${format}`,
+        {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+        },
+      );
+
+      if (!response.ok) {
+        let message = `Unable to download ${format.toUpperCase()}.`;
+        try {
+          const payload = (await response.json()) as { message?: string };
+          if (payload.message) message = payload.message;
+        } catch {
+          // ignore non-JSON error bodies
+        }
+        setError(message);
+        return;
+      }
+
+      const blob = await response.blob();
+      const disposition = response.headers.get("Content-Disposition") ?? "";
+      const matched = /filename="([^"]+)"/i.exec(disposition);
+      const filename =
+        matched?.[1] ?? `digital-presence-report.${format}`;
+
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      anchor.download = filename;
+      anchor.rel = "noopener";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      setError(`Unable to download ${format.toUpperCase()}.`);
+    } finally {
+      setBusy(null);
+    }
+  }
 
   return (
     <section
@@ -27,8 +81,9 @@ export function ReportActions() {
           Report actions
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Downloads, email, and sharing are not connected in this frontend
-          preview. Reports are private by default.
+          {isDemo
+            ? "Download illustrative PDF or PNG exports of this sample report. Email delivery and public sharing are not available."
+            : "Download a PDF or PNG of this report. Live reports are private browser-session snapshots (about 30 minutes) and are not emailed or shared publicly."}
         </p>
       </div>
 
@@ -36,91 +91,34 @@ export function ReportActions() {
         <Button
           type="button"
           variant="secondary"
-          disabled
           className="gap-2"
-          title="PDF download will be connected in a later phase"
-          aria-label="Download PDF (unavailable in demo)"
+          disabled={busy !== null}
+          aria-busy={busy === "pdf"}
+          onClick={() => void download("pdf")}
+          aria-label={isDemo ? "Download sample PDF" : "Download PDF"}
         >
           <Download className="size-4" aria-hidden="true" />
-          Download PDF
+          {busy === "pdf" ? "Preparing PDF…" : "Download PDF"}
         </Button>
         <Button
           type="button"
           variant="secondary"
-          disabled
           className="gap-2"
-          title="PNG download will be connected in a later phase"
-          aria-label="Download PNG (unavailable in demo)"
+          disabled={busy !== null}
+          aria-busy={busy === "png"}
+          onClick={() => void download("png")}
+          aria-label={isDemo ? "Download sample PNG" : "Download PNG"}
         >
           <Download className="size-4" aria-hidden="true" />
-          Download PNG
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          disabled
-          className="gap-2"
-          title="Email delivery will be connected in a later phase"
-          aria-label="Email my report (unavailable in demo)"
-        >
-          <Mail className="size-4" aria-hidden="true" />
-          Email My Report
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!shareOptIn}
-          className="gap-2"
-          onClick={() => setShareEnabled(true)}
-          title={
-            shareOptIn
-              ? "Sharing is a UI placeholder only"
-              : "Opt in below before enabling share UI"
-          }
-          aria-label="Share report (demo placeholder)"
-        >
-          <Share2 className="size-4" aria-hidden="true" />
-          Share Report
+          {busy === "png" ? "Preparing PNG…" : "Download PNG"}
         </Button>
       </div>
 
-      <div className="space-y-3 rounded-lg border border-dashed border-border px-4 py-4">
-        <div className="flex items-start gap-3">
-          <Checkbox
-            id="share-opt-in"
-            checked={shareOptIn}
-            onChange={(event) => {
-              const next = event.target.checked;
-              setShareOptIn(next);
-              if (!next) setShareEnabled(false);
-            }}
-          />
-          <Label htmlFor="share-opt-in" className="font-normal leading-snug">
-            I understand sharing is optional and reports are private unless I
-            explicitly opt in. (Demo UI only — no public link is published.)
-          </Label>
-        </div>
-
-        {shareEnabled ? (
-          <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
-            <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-              <Link2 className="size-4" aria-hidden="true" />
-              Demo share link placeholder (not published)
-            </p>
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-9 px-3"
-              onClick={() => {
-                setShareEnabled(false);
-                setShareOptIn(false);
-              }}
-            >
-              Revoke sharing
-            </Button>
-          </div>
-        ) : null}
-      </div>
+      {error ? (
+        <p className="text-sm text-foreground" role="alert">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }

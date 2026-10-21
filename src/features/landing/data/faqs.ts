@@ -5,8 +5,7 @@ export type FAQItem = {
 };
 
 /**
- * Landing FAQ content describing the intended product experience.
- * Presentation should not imply scanning, email, or sharing are live yet.
+ * Landing FAQ content reflecting the currently shipped product behavior.
  */
 export const faqs: FAQItem[] = [
   {
@@ -19,7 +18,7 @@ export const faqs: FAQItem[] = [
     id: "how-score-calculated",
     question: "How is my Digital Presence Score calculated?",
     answer:
-      "Your score is calculated using a structured 100-point assessment framework. Each category is evaluated against predefined criteria using available evidence. A complete numerical score is displayed only when sufficient information can be verified.",
+      "Your score is calculated using a structured 100-point assessment framework (strict-v1.0). Each category is evaluated against predefined criteria using available evidence. A complete numerical score is displayed only when sufficient information can be verified.",
   },
   {
     id: "what-info-needed",
@@ -43,18 +42,24 @@ export const faqs: FAQItem[] = [
     id: "downloadable-report",
     question: "Will I receive a downloadable report?",
     answer:
-      "The intended report experience includes an online report, downloadable PDF and PNG versions, and optional email delivery when you provide consent.",
+      "Yes. When your assessment finishes, you can view the report online and download PDF and PNG copies. Email delivery is not available yet.",
   },
   {
     id: "report-visibility",
     question: "Is my report publicly visible?",
     answer:
-      "No. Reports are private by default. Public sharing requires your explicit permission, and published report links can be revoked.",
+      "No. Reports are private to your browser session. Public sharing is not available. Live reports are held temporarily in encrypted session cookies (about 30 minutes) and are not stored permanently on our servers.",
   },
   {
     id: "no-website",
     question: "Can I use this tool if my business doesn't have a website?",
     answer:
       "Yes. You can provide basic business information and an available public business profile. If a website cannot be confidently identified, the application can provide a Limited Visibility Snapshot rather than inventing a complete website score.",
+  },
+  {
+    id: "session-limits",
+    question: "How long is my live report available?",
+    answer:
+      "Live reports are short-lived session snapshots (approximately 30 minutes) with a limited encrypted cookie payload size. If the session expires or the result is too large to store, re-run the assessment to generate a new report.",
   },
 ];

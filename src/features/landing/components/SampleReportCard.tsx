@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowUpRight, CheckCircle2, CircleAlert, Download } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -94,7 +93,9 @@ export function SampleReportCard({
             <h3 className="truncate text-lg font-semibold tracking-tight text-foreground">
               {report.businessName}
             </h3>
-            {report.isDemo ? <Badge variant="demo">Demo Report</Badge> : null}
+            {report.isDemo ? (
+              <Badge variant="demo">Sample Report</Badge>
+            ) : null}
           </div>
           <p className="text-sm text-muted-foreground">{report.website}</p>
           <p className="text-xs text-muted-foreground">
@@ -256,17 +257,18 @@ export function SampleReportCard({
             View Sample Report
             <ArrowUpRight className="size-4" aria-hidden="true" />
           </Link>
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-11 gap-2"
-            disabled
-            title="PDF download is not available in this preview"
-            aria-label="Download PDF (unavailable in demo preview)"
+          <a
+            href={`/api/report/${encodeURIComponent(report.id)}/pdf`}
+            className={cn(
+              "inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-background px-5 text-sm font-medium text-foreground",
+              "transition-colors hover:bg-muted",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            )}
+            aria-label="Download sample PDF"
           >
             <Download className="size-4" aria-hidden="true" />
             Download PDF
-          </Button>
+          </a>
         </CardFooter>
       ) : null}
     </Card>

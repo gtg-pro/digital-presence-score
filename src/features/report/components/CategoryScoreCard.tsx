@@ -88,6 +88,37 @@ export function CategoryScoreCard({
               <div key={finding.id} className="rounded-lg border border-border px-3 py-3">
                 <p className="text-sm font-medium text-foreground">{finding.title}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{finding.detail}</p>
+                {finding.evidenceUrl || finding.observedAtLabel || finding.collectionMethod ? (
+                  <dl className="mt-2 space-y-1 text-xs text-muted-foreground">
+                    {finding.evidenceUrl ? (
+                      <div>
+                        <dt className="inline font-medium text-foreground">Source: </dt>
+                        <dd className="inline">
+                          <a
+                            href={finding.evidenceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline underline-offset-2"
+                          >
+                            {finding.evidenceUrl}
+                          </a>
+                        </dd>
+                      </div>
+                    ) : null}
+                    {finding.observedAtLabel ? (
+                      <div>
+                        <dt className="inline font-medium text-foreground">Observed: </dt>
+                        <dd className="inline">{finding.observedAtLabel}</dd>
+                      </div>
+                    ) : null}
+                    {finding.collectionMethod ? (
+                      <div>
+                        <dt className="inline font-medium text-foreground">Method: </dt>
+                        <dd className="inline font-mono">{finding.collectionMethod}</dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                ) : null}
               </div>
             ))}
           </div>

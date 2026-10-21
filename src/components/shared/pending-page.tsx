@@ -8,11 +8,14 @@ export type PendingPageProps = {
   description: string;
 };
 
-/** Minimal placeholder for future legal / methodology pages. */
+/**
+ * Honest interim page for legal/methodology content that is not fully drafted.
+ * Does not invent policy text or claim features that are unavailable.
+ */
 export function PendingPage({ title, description }: PendingPageProps) {
   return (
     <Container className="py-16 sm:py-20 lg:py-24">
-      <Badge variant="outline">Pending content</Badge>
+      <Badge variant="outline">Content forthcoming</Badge>
       <h1 className="mt-4 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
         {title}
       </h1>
@@ -20,8 +23,9 @@ export function PendingPage({ title, description }: PendingPageProps) {
         {description}
       </p>
       <p className="mt-3 text-sm text-muted-foreground">
-        This page is a placeholder. Full content will be added in a later
-        release.
+        Full legal and methodology documentation has not been published yet.
+        Assessments still analyze only publicly accessible business information,
+        and live reports remain private to your browser session.
       </p>
       <Link
         href="/"

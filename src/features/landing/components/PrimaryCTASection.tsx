@@ -21,7 +21,8 @@ export function PrimaryCTASection() {
 
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-background/75 sm:text-lg">
             Get a clear digital-presence assessment with practical findings and
-            recommendations tailored to your business.
+            recommendations based on available public evidence for your
+            business.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">

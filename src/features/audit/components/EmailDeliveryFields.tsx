@@ -16,11 +16,11 @@ export function EmailDeliveryFields({
           id="email-heading"
           className="text-lg font-semibold tracking-tight text-foreground"
         >
-          Email delivery
+          Contact email
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Provide your email if you&apos;d like to receive a copy of your
-          report. Email is optional in this preview.
+          Optional. Email delivery of reports is not available yet — reports are
+          shown in your browser session and can be downloaded as PDF or PNG.
         </p>
       </div>
 
@@ -38,7 +38,9 @@ export function EmailDeliveryFields({
           placeholder="you@business.com"
           value={values.email}
           aria-invalid={errors.email ? true : undefined}
-          aria-describedby={errors.email ? "email-error" : undefined}
+          aria-describedby={
+            errors.email ? "email-error email-unavailable-hint" : "email-unavailable-hint"
+          }
           onChange={(event) => {
             const next = event.target.value;
             onChange("email", next);
@@ -47,6 +49,9 @@ export function EmailDeliveryFields({
             }
           }}
         />
+        <p id="email-unavailable-hint" className="text-xs text-muted-foreground">
+          Providing an email does not trigger automatic report delivery.
+        </p>
         <FieldError id="email-error" message={errors.email} />
       </div>
     </section>

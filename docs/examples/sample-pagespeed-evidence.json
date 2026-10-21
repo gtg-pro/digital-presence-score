@@ -1,0 +1,60 @@
+{
+  "ok": true,
+  "partial": false,
+  "request": {
+    "url": "https://example.com",
+    "normalizedUrl": "https://example.com/",
+    "strategies": ["mobile", "desktop"],
+    "servicePageUrls": ["https://example.com/services"]
+  },
+  "evidence": [
+    {
+      "testedUrl": "https://example.com/",
+      "finalUrl": "https://example.com/",
+      "deviceStrategy": "mobile",
+      "provider": "google_pagespeed_insights",
+      "measuredAt": "2026-10-20T14:00:00.000Z",
+      "availability": "available",
+      "metrics": {
+        "lighthousePerformanceScore": {
+          "name": "lighthouse_performance_score",
+          "value": 82,
+          "unit": "score",
+          "classification": "lab",
+          "availability": "available"
+        },
+        "largestContentfulPaint": {
+          "name": "largest_contentful_paint",
+          "value": 2400,
+          "unit": "millisecond",
+          "classification": "lab",
+          "availability": "available"
+        },
+        "interactionToNextPaint": {
+          "name": "interaction_to_next_paint",
+          "value": null,
+          "unit": null,
+          "classification": "field",
+          "availability": "not_measured",
+          "notes": "INP is field-only; lab TBT is reported separately."
+        },
+        "totalBlockingTime": {
+          "name": "total_blocking_time",
+          "value": 180,
+          "unit": "millisecond",
+          "classification": "lab",
+          "availability": "available",
+          "notes": "Lab Total Blocking Time — not Interaction to Next Paint (INP)."
+        }
+      },
+      "providerMetadata": {
+        "lighthouseVersion": "12.0.0",
+        "fetchTime": "2026-10-20T14:00:00.000Z",
+        "analysisUTCTimestamp": "2026-10-20T14:00:00.000Z",
+        "overallCategory": null
+      }
+    }
+  ],
+  "errors": [],
+  "note": "Illustrative sanitized shape from mocked PSI parsing — not a production score. API keys never included."
+}

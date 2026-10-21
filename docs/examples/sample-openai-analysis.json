@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "status": "available",
+  "model": "gpt-4o-mini",
+  "industryContext": "Home services / plumbing",
+  "businessContext": "Local plumbing company serving Austin",
+  "categoryObservations": [
+    {
+      "category": "website_experience",
+      "availability": "available",
+      "summary": "Homepage clearly presents core plumbing services.",
+      "findingIds": ["f1"]
+    },
+    {
+      "category": "conversion_readiness",
+      "availability": "available",
+      "summary": "A quote CTA is present on the homepage.",
+      "findingIds": ["f2"]
+    }
+  ],
+  "findings": [
+    {
+      "id": "f1",
+      "category": "website_experience",
+      "kind": "strength",
+      "title": "Clear service messaging",
+      "description": "Homepage copy describes drain cleaning and emergency plumbing.",
+      "evidenceIds": ["page-1"],
+      "reasoningSummary": "Supported by homepage title, H1, and excerpt.",
+      "suggestedImprovement": null,
+      "confidence": "high"
+    },
+    {
+      "id": "f2",
+      "category": "conversion_readiness",
+      "kind": "strength",
+      "title": "Visible quote CTA",
+      "description": "Request a Quote CTA is present.",
+      "evidenceIds": ["page-1", "website-1"],
+      "reasoningSummary": "CTA list and website conversion pathways include quote action.",
+      "suggestedImprovement": "Ensure the CTA remains visible on key service pages.",
+      "confidence": "medium"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "r1",
+      "category": "content_authority",
+      "title": "Expand service-page depth",
+      "description": "Add FAQs or guides for major services where evidence is thin.",
+      "evidenceIds": ["page-2"],
+      "priority": "medium",
+      "confidence": "medium"
+    }
+  ],
+  "areasRequiringVerification": [
+    "Any credential or award claims on the website remain unverified."
+  ],
+  "unavailableObservations": [],
+  "overallConfidence": "medium",
+  "unsupportedClaimsDropped": 0,
+  "preparedEvidenceIds": ["website-1", "page-1", "page-2"],
+  "errors": [],
+  "note": "Sanitized illustrative analysis shape. No API keys. No numerical scores."
+}

@@ -1,0 +1,324 @@
+{
+  "complete": {
+    "assessmentId": "[ephemeral-uuid]",
+    "status": "COMPLETE",
+    "overallScore": 80.8,
+    "maturityBand": "growing_digital_presence",
+    "scoringVersion": "strict-v1.0",
+    "totalMaxPoints": 100,
+    "categoryMaxima": [
+      {
+        "id": "website_experience",
+        "max": 25,
+        "earned": 25
+      },
+      {
+        "id": "local_seo_presence",
+        "max": 25,
+        "earned": 20
+      },
+      {
+        "id": "reputation_trust",
+        "max": 20,
+        "earned": 9
+      },
+      {
+        "id": "content_authority",
+        "max": 15,
+        "earned": 12
+      },
+      {
+        "id": "conversion_readiness",
+        "max": 15,
+        "earned": 14.8
+      }
+    ],
+    "evidenceCoverage": 0.87,
+    "unassessedCriteria": [
+      "SEO.discovery_profiles",
+      "REP.third_party_reviews"
+    ],
+    "integrationAvailability": {
+      "crawler": "available",
+      "pagespeed": "available",
+      "openai": "available",
+      "scoring": "available"
+    },
+    "scoringPolicyFlags": [
+      "unassessed_weight_uses_absolute_points_earned",
+      "reputation_provider_unavailable"
+    ],
+    "limitationReasons": [],
+    "errors": [],
+    "warnings": [
+      "unsupported_ai_references"
+    ],
+    "rejectedAiFindingIds": [
+      "bad"
+    ],
+    "evidenceCatalogCount": 5,
+    "ephemeral": true
+  },
+  "partialInsufficientCoverage": {
+    "assessmentId": "[ephemeral-uuid]",
+    "status": "PARTIAL",
+    "overallScore": null,
+    "maturityBand": null,
+    "scoringVersion": "strict-v1.0",
+    "totalMaxPoints": 100,
+    "categoryMaxima": [
+      { "id": "website_experience", "max": 25, "earned": 5.5 },
+      { "id": "local_seo_presence", "max": 25, "earned": 5 },
+      { "id": "reputation_trust", "max": 20, "earned": 0 },
+      { "id": "content_authority", "max": 15, "earned": 0 },
+      { "id": "conversion_readiness", "max": 15, "earned": 0 }
+    ],
+    "evidenceCoverage": 0.45,
+    "unassessedCriteria": [
+      "WE.measured_performance",
+      "SEO.discovery_profiles",
+      "REP.third_party_reviews",
+      "CA.content_upkeep"
+    ],
+    "integrationAvailability": {
+      "crawler": "available",
+      "pagespeed": "unavailable",
+      "openai": "unavailable",
+      "scoring": "available"
+    },
+    "scoringPolicyFlags": [
+      "unassessed_weight_uses_absolute_points_earned",
+      "pagespeed_unavailable",
+      "reputation_provider_unavailable"
+    ],
+    "limitationReasons": [
+      "Confirmed website with insufficient evidence coverage for a complete numerical audit."
+    ],
+    "errors": [],
+    "warnings": [],
+    "rejectedAiFindingIds": [],
+    "evidenceCatalogCount": 2,
+    "ephemeral": true
+  },
+  "brochureLowScoreComplete": {
+    "assessmentId": "[ephemeral-uuid]",
+    "status": "COMPLETE",
+    "overallScore": 10.5,
+    "maturityBand": "foundation_opportunity",
+    "scoringVersion": "strict-v1.0",
+    "totalMaxPoints": 100,
+    "categoryMaxima": [
+      {
+        "id": "website_experience",
+        "max": 25,
+        "earned": 5.5
+      },
+      {
+        "id": "local_seo_presence",
+        "max": 25,
+        "earned": 5
+      },
+      {
+        "id": "reputation_trust",
+        "max": 20,
+        "earned": 0
+      },
+      {
+        "id": "content_authority",
+        "max": 15,
+        "earned": 0
+      },
+      {
+        "id": "conversion_readiness",
+        "max": 15,
+        "earned": 0
+      }
+    ],
+    "evidenceCoverage": 0.84,
+    "unassessedCriteria": [
+      "SEO.discovery_profiles",
+      "REP.third_party_reviews",
+      "CA.content_upkeep"
+    ],
+    "integrationAvailability": {
+      "crawler": "available",
+      "pagespeed": "available",
+      "openai": "available",
+      "scoring": "available"
+    },
+    "scoringPolicyFlags": [
+      "unassessed_weight_uses_absolute_points_earned",
+      "reputation_provider_unavailable"
+    ],
+    "limitationReasons": [],
+    "errors": [],
+    "warnings": [],
+    "rejectedAiFindingIds": [],
+    "evidenceCatalogCount": 3,
+    "ephemeral": true
+  },
+  "missingPageSpeed": {
+    "assessmentId": "[ephemeral-uuid]",
+    "status": "COMPLETE",
+    "overallScore": 73.8,
+    "maturityBand": "growing_digital_presence",
+    "scoringVersion": "strict-v1.0",
+    "totalMaxPoints": 100,
+    "categoryMaxima": [
+      {
+        "id": "website_experience",
+        "max": 25,
+        "earned": 18
+      },
+      {
+        "id": "local_seo_presence",
+        "max": 25,
+        "earned": 20
+      },
+      {
+        "id": "reputation_trust",
+        "max": 20,
+        "earned": 9
+      },
+      {
+        "id": "content_authority",
+        "max": 15,
+        "earned": 12
+      },
+      {
+        "id": "conversion_readiness",
+        "max": 15,
+        "earned": 14.8
+      }
+    ],
+    "evidenceCoverage": 0.8,
+    "unassessedCriteria": [
+      "WE.measured_performance",
+      "SEO.discovery_profiles",
+      "REP.third_party_reviews"
+    ],
+    "integrationAvailability": {
+      "crawler": "available",
+      "pagespeed": "unavailable",
+      "openai": "available",
+      "scoring": "available"
+    },
+    "scoringPolicyFlags": [
+      "unassessed_weight_uses_absolute_points_earned",
+      "pagespeed_unavailable",
+      "reputation_provider_unavailable"
+    ],
+    "limitationReasons": [
+      "Measured performance unavailable; related checks are not assessed (not failed)."
+    ],
+    "errors": [
+      "pagespeed_failure"
+    ],
+    "warnings": [
+      "pagespeed_unavailable",
+      "unsupported_ai_references"
+    ],
+    "rejectedAiFindingIds": [
+      "bad"
+    ],
+    "evidenceCatalogCount": 4,
+    "ephemeral": true
+  },
+  "missingOpenAI": {
+    "assessmentId": "[ephemeral-uuid]",
+    "status": "COMPLETE",
+    "overallScore": 79,
+    "maturityBand": "growing_digital_presence",
+    "scoringVersion": "strict-v1.0",
+    "totalMaxPoints": 100,
+    "categoryMaxima": [
+      {
+        "id": "website_experience",
+        "max": 25,
+        "earned": 24.6
+      },
+      {
+        "id": "local_seo_presence",
+        "max": 25,
+        "earned": 20
+      },
+      {
+        "id": "reputation_trust",
+        "max": 20,
+        "earned": 7.6
+      },
+      {
+        "id": "content_authority",
+        "max": 15,
+        "earned": 12
+      },
+      {
+        "id": "conversion_readiness",
+        "max": 15,
+        "earned": 14.8
+      }
+    ],
+    "evidenceCoverage": 0.87,
+    "unassessedCriteria": [
+      "SEO.discovery_profiles",
+      "REP.third_party_reviews"
+    ],
+    "integrationAvailability": {
+      "crawler": "available",
+      "pagespeed": "available",
+      "openai": "error",
+      "scoring": "available"
+    },
+    "scoringPolicyFlags": [
+      "unassessed_weight_uses_absolute_points_earned",
+      "reputation_provider_unavailable"
+    ],
+    "limitationReasons": [
+      "Qualitative AI analysis unavailable; scoring continues on crawl/performance evidence only."
+    ],
+    "errors": [
+      "openai_failure"
+    ],
+    "warnings": [
+      "openai_unavailable"
+    ],
+    "rejectedAiFindingIds": [],
+    "evidenceCatalogCount": 5,
+    "ephemeral": true
+  },
+  "limitedVisibility": {
+    "assessmentId": "[ephemeral-uuid]",
+    "status": "LIMITED_VISIBILITY",
+    "overallScore": null,
+    "maturityBand": null,
+    "scoringVersion": "strict-v1.0",
+    "totalMaxPoints": 100,
+    "categoryMaxima": [],
+    "evidenceCoverage": 0,
+    "unassessedCriteria": [],
+    "integrationAvailability": {
+      "crawler": "error",
+      "pagespeed": "not_requested",
+      "openai": "not_requested",
+      "scoring": "not_requested"
+    },
+    "scoringPolicyFlags": [
+      "unassessed_weight_uses_absolute_points_earned"
+    ],
+    "limitationReasons": [
+      "Partial crawl reduced available website evidence.",
+      "No verified website pages were collected."
+    ],
+    "errors": [
+      "partial_crawl",
+      "website_unreachable"
+    ],
+    "warnings": [
+      "partial_crawl"
+    ],
+    "rejectedAiFindingIds": [],
+    "evidenceCatalogCount": 0,
+    "ephemeral": true
+  },
+  "note": "Sanitized AssessmentResult summaries from controlled fixtures. No API keys. Demo frontend unchanged. Under strict-v1.0, FAIL counts as assessed coverage, so thin confirmed websites may still COMPLETE with low absolute scores; PARTIAL is returned when publication coverage thresholds are not met."
+}

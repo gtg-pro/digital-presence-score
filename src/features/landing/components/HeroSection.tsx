@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { SiteLogo } from "@/components/shared/site-logo";
 import { Container } from "@/components/ui/container";
 
 import { WebsiteUrlInput } from "./WebsiteUrlInput";
@@ -13,12 +12,6 @@ export function HeroSection() {
       className="border-b border-border bg-background"
     >
       <Container className="flex flex-col items-center py-10 text-center sm:py-12 lg:py-14">
-        <SiteLogo
-          width={352}
-          priority
-          className="h-auto w-full max-w-[18rem] sm:max-w-[22rem]"
-        />
-
         <h1
           id="hero-heading"
           className="mt-3 max-w-3xl font-display text-4xl leading-[1.1] font-medium tracking-tight text-foreground sm:text-5xl lg:text-6xl"

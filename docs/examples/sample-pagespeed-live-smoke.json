@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "httpStatus": 403,
+  "testedUrl": "https://example.com",
+  "strategy": "mobile",
+  "lighthousePerformanceScore": null,
+  "finalUrl": null,
+  "lighthouseVersion": null,
+  "hasLabLcp": false,
+  "hasFieldInp": false,
+  "note": "Sanitized live smoke summary — API key omitted."
+}

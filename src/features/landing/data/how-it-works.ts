@@ -27,7 +27,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
     number: "03",
     title: "Get Your Report Card",
     description:
-      "Receive a clear report with evidence-backed findings, category scores where sufficient data is available, and prioritized recommendations.",
+      "View your report with evidence-backed findings, category scores where enough data is available, and prioritized recommendations — then download PDF or PNG. Live reports are temporary browser-session snapshots.",
     icon: FileChartColumn,
   },
 ];

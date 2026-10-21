@@ -15,7 +15,9 @@ export function StrengthsSection({ report }: { report: DigitalPresenceReport }) 
           Key strengths
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Illustrative, evidence-supported strengths for this demo fixture.
+          {report.isDemo
+            ? "Illustrative, evidence-supported strengths for this sample report."
+            : "Evidence-supported strengths from this assessment."}
         </p>
       </div>
       <ul className="space-y-4">

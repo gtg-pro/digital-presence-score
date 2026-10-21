@@ -29,7 +29,7 @@ export function AuditOverallStatus({ snapshot }: AuditOverallStatusProps) {
       aria-atomic="true"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="demo">Demo</Badge>
+        {snapshot.isDemo ? <Badge variant="demo">Demo</Badge> : null}
         <Badge variant="outline">{snapshot.label}</Badge>
       </div>
       <p className="mt-4 text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">

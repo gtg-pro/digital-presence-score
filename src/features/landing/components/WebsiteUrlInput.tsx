@@ -1,12 +1,13 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useId, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Link2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { startAuditFromWebsiteUrl } from "@/features/audit/actions/start-audit";
 import {
   getWebsiteUrlValidationMessage,
   normalizeWebsiteUrl,
@@ -15,12 +16,18 @@ import { cn } from "@/lib/cn";
 
 export type WebsiteUrlInputProps = {
   className?: string;
-  /** Destination path for valid submissions. Defaults to /audit. */
+  /**
+   * When true (default), start a live audit session and go to progress.
+   * Set false to only navigate to /audit with the URL prefilled.
+   */
+  startLiveAudit?: boolean;
+  /** Destination path when startLiveAudit is false. Defaults to /audit. */
   auditPath?: string;
 };
 
 export function WebsiteUrlInput({
   className,
+  startLiveAudit = true,
   auditPath = "/audit",
 }: WebsiteUrlInputProps) {
   const router = useRouter();
@@ -28,9 +35,12 @@ export function WebsiteUrlInput({
   const errorId = useId();
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [submittedOnce, setSubmittedOnce] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isPending || submittedOnce) return;
 
     const message = getWebsiteUrlValidationMessage(value);
     if (message) {
@@ -40,8 +50,22 @@ export function WebsiteUrlInput({
 
     setError(null);
     const normalized = normalizeWebsiteUrl(value);
-    const params = new URLSearchParams({ url: normalized });
-    router.push(`${auditPath}?${params.toString()}`);
+
+    if (!startLiveAudit) {
+      router.push(
+        `${auditPath}?${new URLSearchParams({ url: normalized }).toString()}`,
+      );
+      return;
+    }
+
+    setSubmittedOnce(true);
+    startTransition(async () => {
+      const result = await startAuditFromWebsiteUrl(normalized);
+      if (result && !result.ok) {
+        setSubmittedOnce(false);
+        setError(result.message);
+      }
+    });
   }
 
   return (
@@ -69,6 +93,7 @@ export function WebsiteUrlInput({
             autoComplete="url"
             placeholder="https://example-service.com"
             value={value}
+            disabled={isPending || submittedOnce}
             onChange={(event) => {
               setValue(event.target.value);
               if (error) setError(null);
@@ -82,9 +107,10 @@ export function WebsiteUrlInput({
         <Button
           type="submit"
           variant="primary"
+          disabled={isPending || submittedOnce}
           className="h-14 w-full shrink-0 px-6 text-base sm:w-auto sm:min-w-[11.5rem]"
         >
-          Get My Free Report
+          {isPending || submittedOnce ? "Starting…" : "Get My Free Report"}
         </Button>
       </div>
 

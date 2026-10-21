@@ -29,7 +29,9 @@ export function ImprovementSection({
           Improvement opportunities
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Prioritized illustrative issues for this demo fixture.
+          {report.isDemo
+            ? "Prioritized illustrative issues for this sample report."
+            : "Prioritized improvement opportunities from this assessment."}
         </p>
       </div>
       <ul className="space-y-4">

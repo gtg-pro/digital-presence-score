@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { Link2, NotebookPen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { startAuditFromForm } from "@/features/audit/actions/start-audit";
 import { validateAuditForm } from "@/features/audit/lib/validate-audit-form";
 import {
   initialAuditFormValues,
@@ -31,7 +32,8 @@ export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
   const [profilesOpen, setProfilesOpen] = useState(
     () => Boolean(initialWebsiteUrl.trim()) === false,
   );
-  const [submittedNotice, setSubmittedNotice] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [submittedOnce, setSubmittedOnce] = useState(false);
 
   const fieldProps = useMemo(
     () => ({
@@ -42,7 +44,6 @@ export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
         value: AuditFormValues[K],
       ) => {
         setValues((current) => ({ ...current, [field]: value }));
-        setSubmittedNotice(false);
         setErrors((current) => {
           if (!current[field] && !current.profiles && !current.form) {
             return current;
@@ -63,7 +64,6 @@ export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
   function setEntryMode(mode: AuditEntryMode) {
     setValues((current) => ({ ...current, entryMode: mode }));
     setErrors({});
-    setSubmittedNotice(false);
     if (mode === "minimal") {
       setProfilesOpen(true);
     }
@@ -71,7 +71,7 @@ export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmittedNotice(false);
+    if (isPending || submittedOnce) return;
 
     const nextErrors = validateAuditForm(values);
     setErrors(nextErrors);
@@ -83,8 +83,18 @@ export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
       return;
     }
 
-    // Frontend-only: no API, scan, or navigation to a completed report.
-    setSubmittedNotice(true);
+    setSubmittedOnce(true);
+    startTransition(async () => {
+      const result = await startAuditFromForm(values);
+      if (result && !result.ok) {
+        setSubmittedOnce(false);
+        setErrors((current) => ({
+          ...current,
+          ...(result.fieldErrors ?? {}),
+          form: result.message,
+        }));
+      }
+    });
   }
 
   return (
@@ -128,28 +138,19 @@ export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
       </Card>
 
       <div className="space-y-4">
-        <Button type="submit" className="h-12 w-full sm:w-auto sm:min-w-[14rem]">
-          Start My Assessment
+        <Button
+          type="submit"
+          className="h-12 w-full sm:w-auto sm:min-w-[14rem]"
+          disabled={isPending || submittedOnce}
+        >
+          {isPending || submittedOnce
+            ? "Starting assessment…"
+            : "Start My Assessment"}
         </Button>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Your assessment will review available public digital-presence signals.
           Some information may be unavailable or require further verification.
         </p>
-        <p className="max-w-2xl rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-          Live audit processing is not connected yet. Submitting validates your
-          details in the browser only — no scanning, scoring, or report
-          generation runs from this form.
-        </p>
-
-        {submittedNotice ? (
-          <p
-            role="status"
-            className="rounded-lg border border-foreground/20 bg-background px-4 py-3 text-sm text-foreground"
-          >
-            Form looks valid. Audit processing, storage, and report delivery are
-            not enabled in this frontend preview — nothing was sent or scored.
-          </p>
-        ) : null}
 
         {errors.form ? (
           <p role="alert" className="text-sm text-foreground">

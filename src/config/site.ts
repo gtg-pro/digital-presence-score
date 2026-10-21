@@ -6,7 +6,7 @@ export const siteConfig = {
   footerDescription:
     "Helping service businesses understand their online presence through clear assessments and actionable recommendations.",
   disclaimer:
-    "This tool evaluates publicly observable digital presence, not actual service quality or official search-engine rankings.",
+    "This tool evaluates publicly observable digital presence, not actual service quality or official search-engine rankings. Live reports are temporary browser-session snapshots (about 30 minutes), not permanently stored results. Email delivery and public sharing are not available.",
   url: "/",
   logoSrc: "/images/logo.png",
 } as const;
