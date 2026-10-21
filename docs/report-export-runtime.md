@@ -12,6 +12,7 @@ Server-side exports use Playwright Chromium (`page.setContent` only; no arbitrar
 
 - Prefer a persistent Node server (`next start`) or a container with Chromium dependencies installed.
 - Many serverless platforms restrict Playwright/Chromium, limit `/tmp`, or enforce short timeouts — validate in the target environment before calling exports production-ready.
+- **File tracing:** Playwright 1.60+ loads `playwright-core/browsers.json` via a dynamic `require(path.join(...))`, so Next.js NFT omits it unless `outputFileTracingIncludes` lists that file for `/api/audit/run` and report PDF/PNG routes (`next.config.ts`). Including the JSON only fixes module load; Chromium must still be installed separately on the host.
 - Ephemeral live reports rely on compressed encrypted httpOnly cookies (`REPORT_SESSION_SECRET`, 30-minute TTL, ~18KB sealed budget). Expired sessions return export errors and never fall back to demo fixtures. Large Cookie headers may require `NODE_OPTIONS=--max-http-header-size=65536`.
 
 ## Security
