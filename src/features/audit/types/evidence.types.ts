@@ -37,6 +37,10 @@ export type CrawlErrorCode =
   | "redirect_error"
   | "unsupported_content_type"
   | "browser_failure"
+  | "browser_launch_failed"
+  | "browser_executable_missing"
+  | "http_forbidden"
+  | "http_rate_limited"
   | "response_too_large"
   | "crawl_limit_reached"
   | "network_error"
@@ -48,6 +52,30 @@ export type CrawlError = {
   message: string;
   url?: string;
   details?: string;
+};
+
+/** Safe, structured crawl-stage diagnostics (no secrets / raw HTML). */
+export type CrawlDiagnostics = {
+  browserLaunchAttempted: boolean;
+  browserLaunchSucceeded: boolean;
+  browserRuntime: "local" | "serverless_linux" | "not_started";
+  browserExecutableSource:
+    | "playwright_bundled"
+    | "sparticuz_chromium"
+    | "env_override"
+    | "none";
+  browserExecutablePresent: boolean | null;
+  browserLaunchFailureCode: CrawlErrorCode | null;
+  sanitizedBrowserLaunchFailure: string | null;
+  navigationAttempted: number;
+  pagesExtracted: number;
+  pagesRejected: number;
+  robotsDecision: "allowed" | "blocked" | "unavailable" | "not_evaluated";
+  finalStatus: "ok" | "partial" | "failed";
+  providerSkipReasons: {
+    pagespeed: string | null;
+    openai: string | null;
+  };
 };
 
 export type CrawlRequest = {
@@ -63,6 +91,31 @@ export type CrawlRequest = {
   maxResponseBytes?: number;
   /** User-Agent for crawl requests. */
   userAgent?: string;
+  /**
+   * Optional browser launcher override (tests / DI).
+   * Production uses the shared serverless-aware launcher.
+   */
+  launchBrowser?: (options?: {
+    timeoutMs?: number;
+  }) => Promise<{
+    browser: import("playwright").Browser;
+    diagnostics: {
+      launchAttempted: boolean;
+      launchSucceeded: boolean;
+      runtime: "local" | "serverless_linux";
+      executableSource:
+        | "playwright_bundled"
+        | "sparticuz_chromium"
+        | "env_override";
+      executablePresent: boolean | null;
+      failureCode:
+        | "browser_executable_missing"
+        | "browser_launch_failed"
+        | "browser_failure"
+        | null;
+      sanitizedFailureReason: string | null;
+    };
+  }>;
 };
 
 export type HeadingEvidence = {
@@ -139,4 +192,5 @@ export type CrawlResult = {
   startedAt: string;
   finishedAt: string;
   partial: boolean;
+  diagnostics: CrawlDiagnostics;
 };

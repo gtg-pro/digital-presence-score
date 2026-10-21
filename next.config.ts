@@ -6,10 +6,13 @@ import type { NextConfig } from "next";
  * functions fail at import with:
  *   Cannot find module '.../playwright-core/browsers.json'
  *   Require stack: .../playwright-core/lib/coreBundle.js
- * This does not install Chromium; it only ships the package asset.
+ *
+ * @sparticuz/chromium supplies a Linux Chromium binary for Netlify/Lambda.
+ * Including browsers.json alone does NOT install a browser executable.
  */
-const playwrightCoreAssets = [
+const playwrightRuntimeAssets = [
   "./node_modules/playwright-core/browsers.json",
+  "./node_modules/@sparticuz/chromium/**",
 ] as const;
 
 const nextConfig: NextConfig = {
@@ -19,12 +22,13 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  serverExternalPackages: ["@sparticuz/chromium", "playwright", "playwright-core"],
   // Escape [id] — picomatch treats bare [id] as a character class, so the
   // include never matches App Router dynamic segments.
   outputFileTracingIncludes: {
-    "/api/audit/run": [...playwrightCoreAssets],
-    "/api/report/\\[id\\]/pdf": [...playwrightCoreAssets],
-    "/api/report/\\[id\\]/png": [...playwrightCoreAssets],
+    "/api/audit/run": [...playwrightRuntimeAssets],
+    "/api/report/\\[id\\]/pdf": [...playwrightRuntimeAssets],
+    "/api/report/\\[id\\]/png": [...playwrightRuntimeAssets],
   },
   turbopack: {
     rules: {

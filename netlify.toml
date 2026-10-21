@@ -1,0 +1,8 @@
+# Netlify Next.js (OpenNext) — Chromium-backed crawl / export.
+# Primary packaging still uses Next.js outputFileTracingIncludes; these
+# settings raise memory and keep the serverless Chromium package available
+# for any classic function bundling paths.
+
+[functions]
+  memory = "2048"
+  included_files = ["node_modules/@sparticuz/chromium/**"]

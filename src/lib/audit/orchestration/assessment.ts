@@ -487,7 +487,9 @@ async function executeAssessment(ctx: {
     limitationReasons.push("Robots restrictions limited crawl coverage.");
   }
 
-  if (crawl.partial) {
+  // Only label partial_crawl when the crawler actually marked a partial success
+  // path — not when Chromium failed to launch (0 pages / total failure).
+  if (crawl.partial && crawl.pages.length > 0) {
     errors.push({
       code: "partial_crawl",
       message: "Crawl completed only partially.",
@@ -498,13 +500,64 @@ async function executeAssessment(ctx: {
       message: "Crawler returned a partial result.",
       integration: "crawler",
     });
+  } else if (crawl.partial && crawl.pages.length === 0) {
+    const primaryCode = crawl.errors[0]?.code;
+    if (
+      primaryCode &&
+      primaryCode !== "browser_executable_missing" &&
+      primaryCode !== "browser_launch_failed"
+    ) {
+      errors.push({
+        code: "partial_crawl",
+        message: "Crawl completed only partially.",
+        details: primaryCode,
+      });
+      limitationReasons.push(
+        `Partial crawl with no verified pages (${primaryCode}).`,
+      );
+    }
   }
 
   if (!crawl.website || crawl.pages.length === 0) {
+    const primary = crawl.errors[0];
+    const launchFailed =
+      primary?.code === "browser_executable_missing" ||
+      primary?.code === "browser_launch_failed";
     availability.crawler =
-      crawl.errors.some((e) => e.code === "ssrf_blocked" || e.code === "invalid_url")
+      crawl.errors.some(
+        (e) =>
+          e.code === "ssrf_blocked" ||
+          e.code === "invalid_url" ||
+          e.code === "browser_executable_missing" ||
+          e.code === "browser_launch_failed",
+      )
         ? "error"
         : "unavailable";
+
+    // Providers were never eligible — record explicit skip reasons (not not_requested).
+    availability.pagespeed = "skipped";
+    availability.openai = "skipped";
+    availability.scoring = "skipped";
+
+    const pagespeedSkip =
+      crawl.diagnostics?.providerSkipReasons.pagespeed ??
+      "PageSpeed skipped: no verified website pages were collected.";
+    const openaiSkip =
+      crawl.diagnostics?.providerSkipReasons.openai ??
+      "OpenAI skipped: no verified website pages were collected.";
+    limitationReasons.push(pagespeedSkip, openaiSkip);
+
+    if (crawl.diagnostics?.sanitizedBrowserLaunchFailure) {
+      limitationReasons.push(
+        `Browser launch: ${crawl.diagnostics.sanitizedBrowserLaunchFailure}`,
+      );
+      warnings.push({
+        code: primary?.code ?? "browser_launch_failed",
+        message: crawl.diagnostics.sanitizedBrowserLaunchFailure,
+        integration: "crawler",
+      });
+    }
+
     emitProgress(
       request,
       "preparing_report",
@@ -520,12 +573,14 @@ async function executeAssessment(ctx: {
       errors: [
         ...errors,
         {
-          code: crawl.errors[0]?.code === "ssrf_blocked"
-            ? "website_unreachable"
-            : "insufficient_evidence",
+          code:
+            primary?.code === "ssrf_blocked" || launchFailed
+              ? "website_unreachable"
+              : "insufficient_evidence",
           message:
-            crawl.errors[0]?.message ??
+            primary?.message ??
             "Website could not be confidently confirmed.",
+          details: primary?.details ?? primary?.code,
         },
       ],
       limitationReasons: [

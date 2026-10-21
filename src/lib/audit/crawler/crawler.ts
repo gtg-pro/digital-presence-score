@@ -1,13 +1,19 @@
 import "server-only";
 
-import { chromium, type Browser, type Page } from "playwright";
+import type { Browser, Page } from "playwright";
 
 import type {
+  CrawlDiagnostics,
   CrawlError,
+  CrawlErrorCode,
   CrawlRequest,
   CrawlResult,
   PageEvidence,
 } from "@/features/audit/types/evidence.types";
+import {
+  emptyCrawlDiagnostics,
+  isBrowserLaunchErrorCode,
+} from "@/lib/audit/crawler/crawl-diagnostics";
 import {
   collectAnchorHrefs,
   extractPageEvidence,
@@ -32,6 +38,11 @@ import {
   validatePublicCrawlUrl,
   validateUrlStructure,
 } from "@/lib/audit/crawler/url-validator";
+import {
+  launchAuditBrowser,
+  sanitizeBrowserErrorMessage,
+  type BrowserLaunchDiagnostics,
+} from "@/lib/browser/launch-chromium";
 
 export const DEFAULT_CRAWL_LIMITS = {
   maxPages: 20,
@@ -352,6 +363,41 @@ async function crawlPageWithPlaywright(options: {
       return { ok: false, error: finalCheck.error };
     }
 
+    const httpStatus = response?.status() ?? null;
+    if (httpStatus === 403) {
+      return {
+        ok: false,
+        error: {
+          code: "http_forbidden",
+          message: "Page returned HTTP 403 Forbidden.",
+          url: finalUrl,
+          details: "403",
+        },
+      };
+    }
+    if (httpStatus === 429) {
+      return {
+        ok: false,
+        error: {
+          code: "http_rate_limited",
+          message: "Page returned HTTP 429 Too Many Requests.",
+          url: finalUrl,
+          details: "429",
+        },
+      };
+    }
+    if (httpStatus != null && httpStatus >= 400) {
+      return {
+        ok: false,
+        error: {
+          code: "network_error",
+          message: `Page returned HTTP ${httpStatus}.`,
+          url: finalUrl,
+          details: String(httpStatus),
+        },
+      };
+    }
+
     const contentType = response?.headers()["content-type"] ?? null;
     if (
       contentType &&
@@ -384,7 +430,7 @@ async function crawlPageWithPlaywright(options: {
     const evidence = extractPageEvidence({
       originalUrl: options.url,
       finalUrl,
-      httpStatus: response?.status() ?? null,
+      httpStatus,
       html,
       contentType,
       allowedOrigin: options.allowedOrigin,
@@ -398,7 +444,7 @@ async function crawlPageWithPlaywright(options: {
       hrefs: collectAnchorHrefs(html),
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = sanitizeBrowserErrorMessage(error);
     const isTimeout = /timeout/i.test(message);
     return {
       ok: false,
@@ -416,6 +462,21 @@ async function crawlPageWithPlaywright(options: {
   }
 }
 
+function applyLaunchDiagnostics(
+  diagnostics: CrawlDiagnostics,
+  launch: BrowserLaunchDiagnostics,
+): void {
+  diagnostics.browserLaunchAttempted = launch.launchAttempted;
+  diagnostics.browserLaunchSucceeded = launch.launchSucceeded;
+  diagnostics.browserRuntime = launch.runtime;
+  diagnostics.browserExecutableSource = launch.executableSource;
+  diagnostics.browserExecutablePresent = launch.executablePresent;
+  if (launch.failureCode) {
+    diagnostics.browserLaunchFailureCode = launch.failureCode;
+  }
+  diagnostics.sanitizedBrowserLaunchFailure = launch.sanitizedFailureReason;
+}
+
 /**
  * Secure, bounded website crawl returning structured evidence only.
  * Server-only — do not import from Client Components.
@@ -424,6 +485,7 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
   const startedAt = utcNow();
   const defaults = mergeDefaults(request);
   const errors: CrawlError[] = [];
+  const diagnostics = emptyCrawlDiagnostics();
 
   const structural = validateUrlStructure(defaults.url);
   if (!structural.ok) {
@@ -436,6 +498,13 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
       startedAt,
       finishedAt: utcNow(),
       partial: false,
+      diagnostics: emptyCrawlDiagnostics({
+        finalStatus: "failed",
+        providerSkipReasons: {
+          pagespeed: "PageSpeed skipped: URL failed structural validation.",
+          openai: "OpenAI skipped: URL failed structural validation.",
+        },
+      }),
     };
   }
 
@@ -450,6 +519,13 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
       startedAt,
       finishedAt: utcNow(),
       partial: false,
+      diagnostics: emptyCrawlDiagnostics({
+        finalStatus: "failed",
+        providerSkipReasons: {
+          pagespeed: `PageSpeed skipped: ${seed.error.message}`,
+          openai: `OpenAI skipped: ${seed.error.message}`,
+        },
+      }),
     };
   }
 
@@ -464,6 +540,7 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
   );
 
   if (robots.available === "blocked") {
+    diagnostics.robotsDecision = "blocked";
     errors.push({
       code: "robots_blocked",
       message:
@@ -479,11 +556,20 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
       startedAt,
       finishedAt: utcNow(),
       partial: false,
+      diagnostics: {
+        ...diagnostics,
+        finalStatus: "failed",
+        providerSkipReasons: {
+          pagespeed: "PageSpeed skipped: robots.txt could not be evaluated safely.",
+          openai: "OpenAI skipped: robots.txt could not be evaluated safely.",
+        },
+      },
     };
   }
 
   const homepagePath = new URL(normalizedUrl).pathname || "/";
   if (!robots.isAllowed(homepagePath)) {
+    diagnostics.robotsDecision = "blocked";
     errors.push({
       code: "robots_blocked",
       message: "Homepage is disallowed by robots.txt.",
@@ -498,8 +584,19 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
       startedAt,
       finishedAt: utcNow(),
       partial: false,
+      diagnostics: {
+        ...diagnostics,
+        finalStatus: "failed",
+        providerSkipReasons: {
+          pagespeed: "PageSpeed skipped: homepage disallowed by robots.txt.",
+          openai: "OpenAI skipped: homepage disallowed by robots.txt.",
+        },
+      },
     };
   }
+
+  diagnostics.robotsDecision =
+    robots.available === "unavailable" ? "unavailable" : "allowed";
 
   const candidates: DiscoveredPage[] = [
     {
@@ -534,12 +631,15 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
   const visited = new Set<string>();
   let pagesSkipped = 0;
   let partial = false;
+  let launchFailed = false;
 
   try {
-    browser = await chromium.launch({
-      headless: true,
-      args: ["--disable-dev-shm-usage", "--no-sandbox"],
+    const launcher = request.launchBrowser ?? launchAuditBrowser;
+    const launched = await launcher({
+      timeoutMs: defaults.navigationTimeoutMs,
     });
+    browser = launched.browser;
+    applyLaunchDiagnostics(diagnostics, launched.diagnostics);
 
     const queue = prioritizeDiscoveredPages(candidates, defaults.maxPages * 3);
 
@@ -551,12 +651,14 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
 
       if (next.depth > defaults.maxDepth) {
         pagesSkipped += 1;
+        diagnostics.pagesRejected += 1;
         continue;
       }
 
       const path = new URL(next.url).pathname || "/";
       if (!robots.isAllowed(path)) {
         pagesSkipped += 1;
+        diagnostics.pagesRejected += 1;
         errors.push({
           code: "robots_blocked",
           message: "Skipped page disallowed by robots.txt.",
@@ -568,10 +670,12 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
       const hopCheck = await validateNavigationTarget(next.url, allowedOrigin);
       if (!hopCheck.ok) {
         pagesSkipped += 1;
+        diagnostics.pagesRejected += 1;
         errors.push(hopCheck.error);
         continue;
       }
 
+      diagnostics.navigationAttempted += 1;
       const crawled = await crawlPageWithPlaywright({
         browser,
         url: hopCheck.url.href,
@@ -583,12 +687,14 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
 
       if (!crawled.ok) {
         pagesSkipped += 1;
+        diagnostics.pagesRejected += 1;
         errors.push(crawled.error);
         partial = true;
         continue;
       }
 
       pages.push(crawled.evidence);
+      diagnostics.pagesExtracted += 1;
 
       if (next.depth < defaults.maxDepth) {
         const childLinks = extractLinksFromHtml(
@@ -610,17 +716,49 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
       partial = true;
     }
   } catch (error) {
+    const launchDiag = (
+      error as Error & { diagnostics?: BrowserLaunchDiagnostics }
+    ).diagnostics;
+    if (launchDiag) {
+      applyLaunchDiagnostics(diagnostics, launchDiag);
+    } else {
+      diagnostics.browserLaunchAttempted = true;
+      diagnostics.browserLaunchSucceeded = false;
+      diagnostics.sanitizedBrowserLaunchFailure =
+        sanitizeBrowserErrorMessage(error);
+    }
+
+    const code: CrawlErrorCode =
+      diagnostics.browserLaunchFailureCode &&
+      isBrowserLaunchErrorCode(diagnostics.browserLaunchFailureCode)
+        ? diagnostics.browserLaunchFailureCode
+        : "browser_launch_failed";
+
+    diagnostics.browserLaunchFailureCode = code;
+    launchFailed = true;
     errors.push({
-      code: "browser_failure",
-      message: "Crawl failed to start or complete the browser session.",
-      details: error instanceof Error ? error.message : String(error),
+      code,
+      message:
+        code === "browser_executable_missing"
+          ? "Chromium executable was not available in the runtime."
+          : "Crawl failed to start or complete the browser session.",
+      details:
+        diagnostics.sanitizedBrowserLaunchFailure ??
+        sanitizeBrowserErrorMessage(error),
     });
-    partial = true;
+    // Launch failures are total failures, not partial crawls.
+    partial = pages.length > 0;
   } finally {
-    await browser?.close();
+    await browser?.close().catch(() => undefined);
   }
 
   if (pages.length === 0) {
+    const primary = errors[0];
+    const skipReason = launchFailed
+      ? `Browser launch failed (${primary?.code ?? "browser_launch_failed"}).`
+      : primary
+        ? primary.message
+        : "No pages could be crawled.";
     return {
       ok: false,
       request: { ...defaults, normalizedUrl },
@@ -637,7 +775,16 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
           ],
       startedAt,
       finishedAt: utcNow(),
-      partial: true,
+      // Preserve true partial only when navigation ran; launch miss is not partial.
+      partial: launchFailed ? false : true,
+      diagnostics: {
+        ...diagnostics,
+        finalStatus: launchFailed ? "failed" : "partial",
+        providerSkipReasons: {
+          pagespeed: `PageSpeed skipped: ${skipReason}`,
+          openai: `OpenAI skipped: ${skipReason}`,
+        },
+      },
     };
   }
 
@@ -670,6 +817,14 @@ export async function crawlWebsite(request: CrawlRequest): Promise<CrawlResult> 
     startedAt,
     finishedAt,
     partial,
+    diagnostics: {
+      ...diagnostics,
+      finalStatus: partial ? "partial" : "ok",
+      providerSkipReasons: {
+        pagespeed: null,
+        openai: null,
+      },
+    },
   };
 }
 

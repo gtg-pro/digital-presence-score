@@ -4,15 +4,17 @@ Server-side exports use Playwright Chromium (`page.setContent` only; no arbitrar
 
 ## Requirements
 
-- Node.js runtime with the Playwright Chromium browser installed (`npx playwright install chromium`).
-- Sufficient memory for headless Chromium (typically ≥512MB free for a single export).
+- **Local / persistent Node:** Playwright Chromium (`npx playwright install chromium`).
+- **Netlify / AWS Lambda Linux:** `@sparticuz/chromium` (bundled via NFT includes + `netlify.toml`). Launch uses `launchAuditBrowser()` — not Playwright’s default downloaded browser.
+- Sufficient memory for headless Chromium (Netlify functions set to 2048 MB in `netlify.toml`; ≥512 MB free typical).
 - Request timeout budget ≥30s for PDF/PNG generation on cold start.
 
 ## Hosting constraints
 
-- Prefer a persistent Node server (`next start`) or a container with Chromium dependencies installed.
-- Many serverless platforms restrict Playwright/Chromium, limit `/tmp`, or enforce short timeouts — validate in the target environment before calling exports production-ready.
-- **File tracing:** Playwright 1.60+ loads `playwright-core/browsers.json` via a dynamic `require(path.join(...))`, so Next.js NFT omits it unless `outputFileTracingIncludes` lists that file for `/api/audit/run` and report PDF/PNG routes (`next.config.ts`). Including the JSON only fixes module load; Chromium must still be installed separately on the host.
+- Prefer a persistent Node server (`next start`) or a container with Chromium dependencies installed when possible.
+- Serverless Linux hosts must ship a compatible Chromium binary (`@sparticuz/chromium`); Playwright’s browser cache is not present in Netlify function bundles.
+- **File tracing:** Playwright 1.60+ loads `playwright-core/browsers.json` via a dynamic `require(path.join(...))`, so Next.js NFT omits it unless `outputFileTracingIncludes` lists that file (and `@sparticuz/chromium/**`) for `/api/audit/run` and report PDF/PNG routes.
+- Function duration, `/tmp` size, and cold-start decompression of Chromium remain platform limits — validate after each deploy.
 - Ephemeral live reports rely on compressed encrypted httpOnly cookies (`REPORT_SESSION_SECRET`, 30-minute TTL, ~18KB sealed budget). Expired sessions return export errors and never fall back to demo fixtures. Large Cookie headers may require `NODE_OPTIONS=--max-http-header-size=65536`.
 
 ## Security

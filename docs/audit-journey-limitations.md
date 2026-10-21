@@ -46,6 +46,13 @@ Verified against the Prompt 21–24 implementation.
 - Client disconnect aborts the in-flight stream where supported.
 - Retry starts a fresh assessment (pending cookie retained on technical failure).
 
+## Browser / crawl runtime (Netlify)
+
+- Live crawls require a launchable Chromium. On Netlify Linux functions this is `@sparticuz/chromium` (not Playwright’s cached browser download).
+- If browser launch fails, the assessment returns **LIMITED_VISIBILITY** with crawl error `browser_executable_missing` / `browser_launch_failed`, evidence coverage 0%, and PageSpeed/OpenAI marked **skipped** with explicit reasons (not silent `not_requested`).
+- Crawl diagnostics record launch attempt/success, sanitized failure reason, navigation counts, robots decision, and final crawler status — without secrets or raw HTML.
+- SSRF and robots restrictions are unchanged. Genuine inaccessible sites still correctly produce LIMITED_VISIBILITY.
+
 ## E2E fixtures (test-only)
 
 - `ALLOW_AUDIT_E2E_FIXTURES=1` enables crawl/PageSpeed/OpenAI injectables for Playwright.

@@ -1,8 +1,9 @@
 import "server-only";
 
-import { chromium, type Browser } from "playwright";
+import type { Browser } from "playwright";
 
 import { getReportDemoById } from "@/features/report/data/report.mock";
+import { launchAuditBrowser } from "@/lib/browser/launch-chromium";
 import {
   isLiveReportId,
   loadLiveReport,
@@ -81,11 +82,8 @@ async function withBrowser<T>(
 ): Promise<T> {
   let browser: Browser | null = null;
   try {
-    browser = await chromium.launch({
-      headless: true,
-      args: ["--disable-dev-shm-usage", "--no-sandbox"],
-      timeout: timeoutMs,
-    });
+    const launched = await launchAuditBrowser({ timeoutMs });
+    browser = launched.browser;
     return await run(browser);
   } finally {
     if (browser) {

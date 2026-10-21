@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { CrawlResult } from "@/features/audit/types/evidence.types";
+import { emptyCrawlDiagnostics } from "@/lib/audit/crawler/crawl-diagnostics";
 import {
   analyzeWebsiteEvidence,
   enforceEvidenceGrounding,
@@ -28,6 +29,16 @@ function sampleCrawl(overrides?: Partial<CrawlResult>): CrawlResult {
       maxResponseBytes: 1_500_000,
       userAgent: "test",
     },
+    diagnostics: emptyCrawlDiagnostics({
+      browserLaunchAttempted: true,
+      browserLaunchSucceeded: true,
+      browserRuntime: "local",
+      browserExecutableSource: "playwright_bundled",
+      browserExecutablePresent: true,
+      navigationAttempted: 2,
+      pagesExtracted: 2,
+      finalStatus: "ok",
+    }),
     website: {
       source: {
         url: "https://example.com/",

@@ -1,4 +1,5 @@
 import type { CrawlResult, PageEvidence } from "@/features/audit/types/evidence.types";
+import { emptyCrawlDiagnostics } from "@/lib/audit/crawler/crawl-diagnostics";
 import type { AIAnalysisResult } from "@/lib/audit/integrations/openai/analysis.types";
 import type {
   PerformanceEvidence,
@@ -117,6 +118,16 @@ export function makeCrawl(options: {
       ...options.websiteOverrides,
     },
     pages: options.pages,
+    diagnostics: emptyCrawlDiagnostics({
+      browserLaunchAttempted: true,
+      browserLaunchSucceeded: true,
+      browserRuntime: "local",
+      browserExecutableSource: "playwright_bundled",
+      browserExecutablePresent: true,
+      navigationAttempted: options.pages.length,
+      pagesExtracted: options.pages.length,
+      finalStatus: options.partial ? "partial" : options.ok === false ? "failed" : "ok",
+    }),
   };
 }
 
@@ -461,6 +472,13 @@ export function blockedWebsiteFixture(): {
       },
       website: null,
       pages: [],
+      diagnostics: emptyCrawlDiagnostics({
+        finalStatus: "failed",
+        providerSkipReasons: {
+          pagespeed: "PageSpeed skipped: Blocked",
+          openai: "OpenAI skipped: Blocked",
+        },
+      }),
     },
     performance: null,
     analysis: null,
