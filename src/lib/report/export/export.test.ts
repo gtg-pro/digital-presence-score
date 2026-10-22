@@ -197,11 +197,11 @@ describe("Playwright PDF/PNG export", () => {
   it("exports COMPLETE assessment-mapped report with decimal score preserved in HTML", async () => {
     const assessment = await runAssessment(inject(strongLocalServiceFixture()));
     const report = mapAssessmentToReport(assessment);
-    expect(report.overallScore).toBe(80.8);
+    expect(report.overallScore).toBe(83.3);
     expect(report.isDemo).toBe(false);
 
     const html = renderReportExportHtml(report);
-    expect(html).toContain("80.8");
+    expect(html).toContain("83.3");
 
     const pdf = await exportReport({ format: "pdf", report, timeoutMs: 60_000 });
     expect(pdf.ok).toBe(true);

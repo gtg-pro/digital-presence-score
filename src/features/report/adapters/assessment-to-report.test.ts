@@ -54,13 +54,13 @@ describe("mapAssessmentToReport", () => {
   it("maps COMPLETE assessments with decimal score preservation", async () => {
     const assessment = await runAssessment(inject(strongLocalServiceFixture()));
     expect(assessment.status).toBe("COMPLETE");
-    expect(assessment.overallScore).toBe(80.8);
+    expect(assessment.overallScore).toBe(83.3);
 
     const report = mapAssessmentToReport(assessment);
     expect(report.isDemo).toBe(false);
     expect(report.outcome).toBe("complete");
-    expect(report.overallScore).toBe(80.8);
-    expect(report.overallScore).not.toBe(81);
+    expect(report.overallScore).toBe(83.3);
+    expect(report.overallScore).not.toBe(83);
     expect(report.maxScore).toBe(100);
     expect(report.scoringVersion).toBe("strict-v1.0");
     expect(report.scoringPolicyId).toBe(LIVE_SCORING_POLICY_ID);

@@ -28,13 +28,8 @@ export function ReportHeader({
         {report.website ?? "Website not confidently verified"}
       </p>
 
-      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <MetaItem
-          label="Service area"
-          value={`${report.serviceArea} (${report.serviceAreaSource === "verified" ? "verified" : "user-supplied"})`}
-        />
+      <dl className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <MetaItem label="Audit date" value={report.auditDateLabel} />
-        <MetaItem label="Report ID" value={report.reportId} mono />
         <MetaItem label="Scoring version" value={report.scoringVersion} mono />
         <MetaItem label="Report status" value={report.statusLabel} />
         <MetaItem

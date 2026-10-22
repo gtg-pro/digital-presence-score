@@ -143,7 +143,7 @@ export function evaluateAllRules(
   evaluations.push(evalConsistentSignals(bundle, pages, crawlWebsite, model));
 
   // --- REP ---
-  evaluations.push(evalThirdPartyReviews(bundle));
+  evaluations.push(evalThirdPartyReviews(bundle, pages, crawlWebsite, blob));
   evaluations.push(evalCredentials(bundle, pages, blob, repFindings));
   evaluations.push(evalTestimonials(bundle, pages, blob, repFindings));
   evaluations.push(evalPublicActivity(crawlWebsite));
@@ -403,6 +403,28 @@ function evalCrawlabilitySchema(
   return award(criterionId, ruleId, "FAIL", 0, refs, "Crawlability/indexability signals weak or blocked.", "seo.crawl.fail");
 }
 
+const DISCOVERY_PROFILE_HOST_RE =
+  /(^|\.)((maps\.)?google\.|goo\.gl|yelp\.com|bbb\.org|angi\.com|homeadvisor\.com|thumbtack\.com|yellowpages\.com|facebook\.com|fb\.com)/i;
+
+const STRONG_DISCOVERY_URL_RE =
+  /google\.[^/]+\/maps|maps\.google\.|goo\.gl\/maps|yelp\.com\/biz|bbb\.org|angi\.com|homeadvisor\.com|thumbtack\.com/i;
+
+function collectOutboundHrefs(
+  website: import("@/features/audit/types/evidence.types").WebsiteEvidence | null,
+  pages: PageEvidence[],
+): string[] {
+  const found = new Set<string>();
+  for (const link of website?.publicSocialProfileLinks ?? []) {
+    found.add(link);
+  }
+  for (const page of pages) {
+    for (const cta of page.ctas) {
+      if (cta.href) found.add(cta.href);
+    }
+  }
+  return [...found];
+}
+
 function evalDiscoveryProfiles(
   bundle: MappedEvidenceBundle,
   website: import("@/features/audit/types/evidence.types").WebsiteEvidence | null,
@@ -410,23 +432,73 @@ function evalDiscoveryProfiles(
 ): RuleEvaluation {
   const ruleId = "rule.SEO.discovery_profiles.v1";
   const criterionId = "SEO.discovery_profiles";
-  // Applicability handled outside; if remote N/A this won't be scored.
-  // Without a GBP/reputation provider, local discovery profiles cannot be verified.
-  if (model === "remote_online") {
-    // Still return NOT_ASSESSED here only if applicable; engine marks N/A separately.
+  void model; // Applicability (e.g. remote N/A) is decided outside this rule.
+  const pages = bundle.verifiedPages;
+  if (pages.length === 0 && !website) {
+    return award(
+      criterionId,
+      ruleId,
+      "NOT_ASSESSED",
+      0,
+      { evidenceIds: [], sourceUrls: [], observationTimestamps: [] },
+      "No website pages available to assess discovery-profile links.",
+      null,
+    );
+  }
+
+  const refs = refsForPages(bundle, pages.slice(0, 2));
+  const hrefs = collectOutboundHrefs(website, pages);
+  const discoveryLinks = hrefs.filter((href) => {
+    try {
+      const host = new URL(href, website?.homepageUrl ?? undefined).hostname;
+      return DISCOVERY_PROFILE_HOST_RE.test(host) || STRONG_DISCOVERY_URL_RE.test(href);
+    } catch {
+      return STRONG_DISCOVERY_URL_RE.test(href);
+    }
+  });
+  const strongLinks = discoveryLinks.filter((href) =>
+    STRONG_DISCOVERY_URL_RE.test(href),
+  );
+  const hasLocalBusinessSchema = pages.some((page) =>
+    page.structuredDataTypes.some((type) =>
+      /LocalBusiness|ProfessionalService|HomeAndConstructionBusiness|Store|FoodEstablishment/i.test(
+        type,
+      ),
+    ),
+  );
+
+  if (strongLinks.length >= 1) {
+    return award(
+      criterionId,
+      ruleId,
+      "PASS",
+      1,
+      { ...refs, sourceUrls: [...refs.sourceUrls, ...strongLinks.slice(0, 2)] },
+      "Discovery-profile links (maps/directories) were observed on the website.",
+      "seo.discovery.pass",
+    );
+  }
+  if (discoveryLinks.length >= 1 || hasLocalBusinessSchema) {
+    return award(
+      criterionId,
+      ruleId,
+      "PARTIAL",
+      0.5,
+      refs,
+      hasLocalBusinessSchema
+        ? "LocalBusiness (or similar) schema observed; directory/maps profile links were limited."
+        : "Possible discovery-profile links observed without a clear maps/directory profile URL.",
+      "seo.discovery.partial",
+    );
   }
   return award(
     criterionId,
     ruleId,
-    "NOT_ASSESSED",
+    "FAIL",
     0,
-    {
-      evidenceIds: website ? ["website-1"] : [],
-      sourceUrls: website?.homepageUrl ? [website.homepageUrl] : [],
-      observationTimestamps: website ? [website.source.observedAt] : [],
-    },
-    "Appropriate discovery profiles (e.g. Google Business Profile) are not independently verified in this scoring version; criterion remains NOT_ASSESSED.",
-    "seo.discovery.unverified",
+    refs,
+    "No maps/directory discovery-profile links or LocalBusiness schema were observed on crawled pages.",
+    "seo.discovery.none",
   );
 }
 
@@ -464,22 +536,97 @@ function evalConsistentSignals(
   return award(criterionId, ruleId, "FAIL", 0, refs, "Contact/service-area signals missing.", "seo.nap.fail");
 }
 
-function evalThirdPartyReviews(bundle: MappedEvidenceBundle): RuleEvaluation {
+const REVIEW_PLATFORM_URL_RE =
+  /yelp\.com|tripadvisor\.com|trustpilot\.com|google\.[^/]+\/maps|maps\.google\.|bbb\.org|angi\.com|sitejabber\.com|g2\.com|capterra\.com/i;
+
+function evalThirdPartyReviews(
+  bundle: MappedEvidenceBundle,
+  pages: PageEvidence[],
+  website: import("@/features/audit/types/evidence.types").WebsiteEvidence | null,
+  blob: string,
+): RuleEvaluation {
   const ruleId = "rule.REP.third_party_reviews.v1";
   const criterionId = "REP.third_party_reviews";
-  if (!bundle.reputationProviderAvailable) {
+  if (pages.length === 0) {
     return award(
       criterionId,
       ruleId,
       "NOT_ASSESSED",
       0,
       { evidenceIds: [], sourceUrls: [], observationTimestamps: [] },
-      "No reputation provider integration available; verifiable third-party reviews remain NOT_ASSESSED.",
-      "rep.reviews.provider_missing",
+      "No website pages available to assess third-party review signals.",
+      null,
     );
   }
-  // Future provider path would assess here.
-  return award(criterionId, ruleId, "NOT_ASSESSED", 0, { evidenceIds: [], sourceUrls: [], observationTimestamps: [] }, "Reputation provider returned no usable data.", null);
+
+  const refs = refsForPages(bundle, pages.slice(0, 2));
+  const hrefs = collectOutboundHrefs(website, pages);
+  const reviewPlatformLinks = hrefs.filter((href) =>
+    REVIEW_PLATFORM_URL_RE.test(href),
+  );
+  const hasReviewSchema = pages.some((page) =>
+    page.structuredDataTypes.some((type) =>
+      /AggregateRating|Review|Rating/i.test(type),
+    ),
+  );
+  const reviewCopy = /\b(\d+(\.\d+)?\s*\/\s*5|\d+\s*\+\s*reviews?|google reviews?|rated\s+\d|★★|stars?\s+on\s+yelp)\b/i.test(
+    blob,
+  );
+
+  // External reputation APIs are out of scope; score only observable on-site signals.
+  if (hasReviewSchema && reviewPlatformLinks.length >= 1) {
+    return award(
+      criterionId,
+      ruleId,
+      "PASS",
+      0.85,
+      {
+        ...refs,
+        sourceUrls: [...refs.sourceUrls, ...reviewPlatformLinks.slice(0, 2)],
+      },
+      "Review schema and third-party review-platform links were observed on the website.",
+      "rep.reviews.pass",
+    );
+  }
+  if (hasReviewSchema || reviewPlatformLinks.length >= 1) {
+    return award(
+      criterionId,
+      ruleId,
+      "PARTIAL",
+      0.55,
+      {
+        ...refs,
+        sourceUrls: [
+          ...refs.sourceUrls,
+          ...reviewPlatformLinks.slice(0, 2),
+        ],
+      },
+      hasReviewSchema
+        ? "Review/AggregateRating schema was observed on crawled pages."
+        : "Third-party review-platform links were observed on the website.",
+      "rep.reviews.partial",
+    );
+  }
+  if (reviewCopy) {
+    return award(
+      criterionId,
+      ruleId,
+      "PARTIAL",
+      0.35,
+      refs,
+      "On-site copy references ratings/reviews, but no review schema or platform links were confirmed.",
+      "rep.reviews.copy_only",
+    );
+  }
+  return award(
+    criterionId,
+    ruleId,
+    "FAIL",
+    0,
+    refs,
+    "No third-party review schema, platform links, or clear rating signals were observed on crawled pages.",
+    "rep.reviews.none",
+  );
 }
 
 function evalCredentials(

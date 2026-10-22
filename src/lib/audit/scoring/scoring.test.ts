@@ -122,13 +122,83 @@ describe("assessment and applicability states", () => {
     expect(result.policyFlags).toContain("pagespeed_unavailable");
   });
 
-  it("marks missing reputation provider as NOT_ASSESSED", () => {
+  it("scores third-party review signals from the website without a reputation API", () => {
     const result = scoreDigitalPresence(strongLocalServiceFixture());
     const reviews = result.categories
       .flatMap((c) => c.criteria)
       .find((c) => c.criterionId === "REP.third_party_reviews");
-    expect(reviews?.assessment).toBe("NOT_ASSESSED");
+    // Strong fixture has testimonials copy but no review schema/platform links.
+    expect(reviews?.assessment).toBe("FAIL");
+    expect(reviews?.earnedPoints).toBe(0);
     expect(result.policyFlags).toContain("reputation_provider_unavailable");
+  });
+
+  it("awards discovery/review points from observed website evidence", () => {
+    const fixture = strongLocalServiceFixture();
+    const home = fixture.crawl.pages[0]!;
+    const withSignals = {
+      ...fixture,
+      crawl: {
+        ...fixture.crawl,
+        pages: [
+          {
+            ...home,
+            structuredDataTypes: ["LocalBusiness", "AggregateRating"],
+            ctas: [
+              ...home.ctas,
+              {
+                text: "Google reviews",
+                href: "https://maps.google.com/?cid=123",
+              },
+              { text: "Yelp", href: "https://www.yelp.com/biz/acme-plumbing" },
+            ],
+          },
+          ...fixture.crawl.pages.slice(1),
+        ],
+        website: fixture.crawl.website
+          ? {
+              ...fixture.crawl.website,
+              publicSocialProfileLinks: [
+                ...(fixture.crawl.website.publicSocialProfileLinks ?? []),
+                "https://maps.google.com/?cid=123",
+                "https://www.yelp.com/biz/acme-plumbing",
+              ],
+            }
+          : null,
+      },
+    };
+
+    const result = scoreDigitalPresence(withSignals);
+    const discovery = result.categories
+      .flatMap((c) => c.criteria)
+      .find((c) => c.criterionId === "SEO.discovery_profiles");
+    const reviews = result.categories
+      .flatMap((c) => c.criteria)
+      .find((c) => c.criterionId === "REP.third_party_reviews");
+
+    expect(discovery?.assessment).toBe("PASS");
+    expect(reviews?.assessment).toMatch(/PASS|PARTIAL/);
+    expect(discovery?.assessment).not.toBe("NOT_ASSESSED");
+    expect(reviews?.assessment).not.toBe("NOT_ASSESSED");
+  });
+
+  it("varies category assessed weight across different website evidence", () => {
+    const strong = scoreDigitalPresence(strongLocalServiceFixture());
+    const thin = scoreDigitalPresence(brochureFixture());
+
+    const strongSeo = strong.categories.find(
+      (c) => c.categoryId === "local_seo_presence",
+    );
+    const thinSeo = thin.categories.find(
+      (c) => c.categoryId === "local_seo_presence",
+    );
+
+    expect(strongSeo?.unassessedEffectiveWeight).toBe(0);
+    expect(thinSeo?.assessedEffectiveWeight).toBeGreaterThan(0);
+    // Coverage must reflect real evidence differences, not a canned constant.
+    expect(strong.coverage.weightedCoverage).not.toBe(
+      thin.coverage.weightedCoverage,
+    );
   });
 
   it("marks local discovery profiles NOT_APPLICABLE for remote-only businesses", () => {
@@ -340,6 +410,7 @@ describe("coverage and outcomes", () => {
     expect(report.applicableEffectiveWeight).toBe(6);
     expect(report.assessedEffectiveWeight).toBe(6);
     expect(report.weightedCoverage).toBe(1);
+    // Discovery is NOT_APPLICABLE here (effectiveMax 0) so it never enters the pool.
   });
 
   it("varies coverage when website-signal criteria stay NOT_ASSESSED", () => {

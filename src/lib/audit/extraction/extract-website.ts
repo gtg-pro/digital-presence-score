@@ -18,6 +18,12 @@ const SOCIAL_HOSTS = [
   "yelp.com",
   "maps.google.com",
   "goo.gl",
+  "bbb.org",
+  "angi.com",
+  "homeadvisor.com",
+  "thumbtack.com",
+  "tripadvisor.com",
+  "trustpilot.com",
 ];
 
 function availabilityFromUrl(url: string | null): AssessmentAvailability {

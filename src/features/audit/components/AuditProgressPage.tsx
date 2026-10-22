@@ -8,8 +8,14 @@ import { SiteLogo } from "@/components/shared/site-logo";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { useAuditRunStream } from "@/features/audit/hooks/useAuditRunStream";
-import { auditProgressDemoSnapshots } from "@/features/audit/data/audit-progress.mock";
-import type { AuditDemoStateKey } from "@/features/audit/types/audit-progress.types";
+import {
+  auditProgressDemoSnapshots,
+  auditProgressStageDefinitions,
+} from "@/features/audit/data/audit-progress.mock";
+import type {
+  AuditDemoStateKey,
+  AuditProgressSnapshot,
+} from "@/features/audit/types/audit-progress.types";
 
 import { AuditDemoStateSelector } from "./AuditDemoStateSelector";
 import { AuditOverallStatus } from "./AuditOverallStatus";
@@ -19,6 +25,49 @@ export type AuditProgressPageProps = {
   /** Server-checked pending audit cookie presence (no secret values). */
   hasPendingSession: boolean;
 };
+
+/**
+ * Prefer the live stream snapshot once a run has started — even if the pending
+ * cookie is cleared on complete (Server Action refresh would otherwise stamp
+ * every stage as Failed while leaving real progress details intact).
+ */
+export function resolveAuditProgressSnapshot(options: {
+  demoMode: boolean;
+  demoState: AuditDemoStateKey;
+  hasPendingSession: boolean;
+  liveSnapshot: AuditProgressSnapshot;
+  streamStarted: boolean;
+}): AuditProgressSnapshot {
+  const {
+    demoMode,
+    demoState,
+    hasPendingSession,
+    liveSnapshot,
+    streamStarted,
+  } = options;
+
+  if (demoMode) return auditProgressDemoSnapshots[demoState];
+
+  if (!hasPendingSession && !streamStarted) {
+    return {
+      id: "missing-session",
+      isDemo: false,
+      label: "Live assessment",
+      outcome: "failed",
+      headline: "Audit session missing",
+      summary:
+        "No pending audit session was found. Start again from the homepage or audit form. This page will not invent progress or demo results.",
+      stages: auditProgressStageDefinitions.map((definition) => ({
+        id: definition.id,
+        status: "failed" as const,
+      })),
+      errorMessage: "Pending audit session missing or expired.",
+      retryable: false,
+    };
+  }
+
+  return liveSnapshot;
+}
 
 export function AuditProgressPage({
   hasPendingSession,
@@ -32,63 +81,31 @@ export function AuditProgressPage({
     useAuditRunStream({
       enabled: streamEnabled,
     });
-  const clientMounted = diagnostics.clientMounted || streamEnabled;
+  const streamStarted =
+    diagnostics.initAttempted || diagnostics.fetchInitiated;
 
-  const missingSessionSnapshot = useMemo(
-    () => ({
-      id: "missing-session",
-      isDemo: false,
-      label: "Live assessment",
-      outcome: "failed" as const,
-      headline: "Audit session missing",
-      summary:
-        "No pending audit session was found. Start again from the homepage or audit form. This page will not invent progress or demo results.",
-      stages: liveSnapshot.stages.map((stage) => ({
-        ...stage,
-        status: "failed" as const,
-      })),
-      errorMessage: "Pending audit session missing or expired.",
-      retryable: false,
-    }),
-    [liveSnapshot.stages],
+  const snapshot = useMemo(
+    () =>
+      resolveAuditProgressSnapshot({
+        demoMode,
+        demoState,
+        hasPendingSession,
+        liveSnapshot,
+        streamStarted,
+      }),
+    [demoMode, demoState, hasPendingSession, liveSnapshot, streamStarted],
   );
-
-  const snapshot = useMemo(() => {
-    if (demoMode) return auditProgressDemoSnapshots[demoState];
-    if (!hasPendingSession) return missingSessionSnapshot;
-    return liveSnapshot;
-  }, [
-    demoMode,
-    demoState,
-    hasPendingSession,
-    liveSnapshot,
-    missingSessionSnapshot,
-  ]);
-
-  const showDiagnostics =
-    process.env.NODE_ENV === "development" && !demoMode;
 
   return (
     <Container className="py-12 sm:py-16 lg:py-20">
       <div
         className="mx-auto max-w-3xl"
         data-audit-progress-root="true"
-        data-audit-demo={demoMode ? "1" : "0"}
         data-audit-pending-session={hasPendingSession ? "yes" : "no"}
-        data-audit-client-mounted={clientMounted ? "yes" : "no"}
-        data-audit-stream-enabled={streamEnabled ? "yes" : "no"}
-        data-audit-init-attempted={diagnostics.initAttempted ? "yes" : "no"}
-        data-audit-fetch-initiated={diagnostics.fetchInitiated ? "yes" : "no"}
-        data-audit-response-status={
-          diagnostics.responseStatus == null
-            ? ""
-            : String(diagnostics.responseStatus)
-        }
-        data-audit-sse-terminal={
-          diagnostics.sseTerminalReceived ? "yes" : "no"
+        data-audit-fetch-initiated={
+          diagnostics.fetchInitiated ? "yes" : "no"
         }
       >
-        <SiteLogo width={160} className="max-w-[11rem]" />
         <h1 className="mt-5 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem]">
           Analyzing your digital presence.
         </h1>
@@ -96,35 +113,6 @@ export function AuditProgressPage({
           Our assessment process reviews available public digital signals to
           identify strengths, weaknesses, and improvement opportunities.
         </p>
-
-        {showDiagnostics ? (
-          <aside
-            className="mt-6 rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 font-mono text-xs text-muted-foreground"
-            data-audit-diagnostics="true"
-            aria-label="Temporary audit diagnostics"
-          >
-            <p>Pending session created: {hasPendingSession ? "yes" : "no"}</p>
-            <p>Progress client mounted: {clientMounted ? "yes" : "no"}</p>
-            <p>
-              Audit stream initialization attempted:{" "}
-              {diagnostics.initAttempted ? "yes" : "no"}
-            </p>
-            <p>
-              /api/audit/run fetch initiated:{" "}
-              {diagnostics.fetchInitiated ? "yes" : "no"}
-            </p>
-            <p>
-              Response status:{" "}
-              {diagnostics.responseStatus == null
-                ? "n/a"
-                : diagnostics.responseStatus}
-            </p>
-            <p>
-              SSE terminal event received:{" "}
-              {diagnostics.sseTerminalReceived ? "yes" : "no"}
-            </p>
-          </aside>
-        ) : null}
 
         <div className="mt-8 space-y-6">
           {demoMode ? (

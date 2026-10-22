@@ -1,7 +1,6 @@
 import { Container } from "@/components/ui/container";
 import type { DigitalPresenceReport } from "@/features/report/types/report.types";
 
-import { ActionPlanSection } from "./ActionPlanSection";
 import { CategoryBreakdown } from "./CategoryBreakdown";
 import { ImprovementSection } from "./ImprovementSection";
 import { MethodologySection } from "./MethodologySection";
@@ -40,28 +39,7 @@ export function ReportResultView({
         {report.outcome !== "limited" ? (
           <ImprovementSection report={report} />
         ) : null}
-        {report.outcome !== "limited" ? (
-          <ActionPlanSection report={report} />
-        ) : null}
         <UnableToVerifySection report={report} />
-        {report.integrationWarnings && report.integrationWarnings.length > 0 ? (
-          <section
-            aria-labelledby="integration-warnings-heading"
-            className="rounded-xl border border-border bg-background p-5 shadow-sm sm:p-6"
-          >
-            <h2
-              id="integration-warnings-heading"
-              className="text-lg font-semibold tracking-tight text-foreground"
-            >
-              Integration notes
-            </h2>
-            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-              {report.integrationWarnings.map((warning) => (
-                <li key={warning}>{warning}</li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
         <MethodologySection report={report} />
         <ReportActions reportId={report.id} isDemo={report.isDemo} />
         <StrategyCallCTA />

@@ -122,19 +122,6 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
             .join("")}</ul>
         </section>`;
 
-  const actionsHtml =
-    report.outcome === "limited" || report.actionPlan.length === 0
-      ? ""
-      : `<section class="block avoid-break">
-          <h2>Recommended actions</h2>
-          <ol>${report.actionPlan
-            .map(
-              (item) =>
-                `<li>${escapeHtml(item.action)} <span class="muted small">(${escapeHtml(item.priority)} priority)</span></li>`,
-            )
-            .join("")}</ol>
-        </section>`;
-
   const unableHtml =
     report.unableToVerify.length === 0
       ? ""
@@ -148,14 +135,6 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
             )
             .join("")}</ul>
         </section>`;
-
-  const warningsHtml =
-    report.integrationWarnings && report.integrationWarnings.length > 0
-      ? `<section class="block avoid-break">
-          <h2>Integration notes</h2>
-          ${listItems(report.integrationWarnings)}
-        </section>`
-      : "";
 
   const methodology = report.methodology;
   const policyNote = report.scoringPolicyId
@@ -248,7 +227,6 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
     <div class="meta">
       <span>Status: <strong>${escapeHtml(report.statusLabel)}</strong></span>
       <span>Date: ${escapeHtml(report.auditDateLabel)}</span>
-      <span>Report ID: <span class="mono">${escapeHtml(report.reportId)}</span></span>
       <span>Scoring: <span class="mono">${escapeHtml(report.scoringVersion)}</span></span>
       <span>Coverage: ${escapeHtml(String(report.evidenceCoveragePercent))}%</span>
     </div>
@@ -258,9 +236,7 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
   ${categoriesHtml}
   ${strengthsHtml}
   ${improvementsHtml}
-  ${actionsHtml}
   ${unableHtml}
-  ${warningsHtml}
   ${methodologyHtml}
 </body>
 </html>`;
