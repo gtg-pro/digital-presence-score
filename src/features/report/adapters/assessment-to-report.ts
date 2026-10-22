@@ -3,7 +3,6 @@ import type { AssessmentResult } from "@/lib/audit/orchestration/assessment.type
 import type {
   CategoryScore,
   MaturityBandId,
-  ScoredCriterion,
 } from "@/lib/audit/scoring/scoring.types";
 import type {
   CategoryAssessmentStatus,
@@ -20,11 +19,13 @@ import type {
   UnableToVerifyItem,
 } from "@/features/report/types/report.types";
 
+/** Internal integrity marker for live report validation — not customer-facing copy. */
 export const LIVE_SCORING_POLICY_ID =
   "unassessed_weight_uses_absolute_points_earned" as const;
 
+/** Internal note retained for compatibility — not customer-facing copy. */
 export const LIVE_SCORING_POLICY_EXPLANATION =
-  "Unassessed checks are not automatically treated as failures. Published scores reflect verified points earned under the current scoring methodology; unavailable checks are disclosed separately.";
+  "Published scores reflect publicly supported findings under the current methodology.";
 
 const CATEGORY_UI_IDS: Record<string, string> = {
   website_experience: "website-experience",
@@ -51,9 +52,9 @@ function outcomeFromStatus(
 }
 
 function statusLabelFor(status: AssessmentResult["status"]): string {
-  if (status === "COMPLETE") return "Complete Audit";
-  if (status === "PARTIAL") return "Partial Audit";
-  return "Limited Visibility Snapshot";
+  if (status === "COMPLETE") return "Digital Presence Report";
+  if (status === "PARTIAL") return "Digital Presence Overview";
+  return "Limited Digital Presence Overview";
 }
 
 function maturityLabel(
@@ -101,32 +102,12 @@ function categoryStatus(category: CategoryScore): CategoryAssessmentStatus {
   return "assessed";
 }
 
-function evidenceLookup(result: AssessmentResult) {
-  const byId = new Map(
-    result.evidenceCatalog.map((item) => [item.id, item] as const),
-  );
-  return byId;
-}
-
-function findingFromCriterion(
-  criterion: ScoredCriterion,
-  evidenceById: ReturnType<typeof evidenceLookup>,
-): ReportCategoryFinding {
-  const primaryId = criterion.evidenceIds[0];
-  const evidence = primaryId ? evidenceById.get(primaryId) : undefined;
-  return {
-    id: criterion.criterionId,
-    title: criterion.name,
-    detail: criterion.rationale,
-    evidenceId: primaryId,
-    evidenceUrl: safeHttpUrl(evidence?.sourceUrl ?? criterion.sourceUrls[0]),
-    observedAtLabel: evidence
-      ? formatUtcLabel(evidence.observedAt)
-      : criterion.observationTimestamps[0]
-        ? formatUtcLabel(criterion.observationTimestamps[0])
-        : undefined,
-    collectionMethod: evidence?.collectionMethod,
-  };
+function professionalCategoryStatusLabel(
+  status: CategoryAssessmentStatus,
+): string {
+  if (status === "assessed") return "Reviewed";
+  if (status === "partially_assessed") return "Partially reviewed";
+  return "Limited information";
 }
 
 function mapCategories(result: AssessmentResult): ReportCategoryResult[] {
@@ -134,15 +115,28 @@ function mapCategories(result: AssessmentResult): ReportCategoryResult[] {
     return [];
   }
 
-  const evidenceById = evidenceLookup(result);
   return result.categories.map((category) => {
-    const assessedCriteria = category.criteria.filter(
-      (c) =>
-        c.applicability === "APPLICABLE" && c.assessment !== "NOT_ASSESSED",
-    );
-    const findings = assessedCriteria.map((c) =>
-      findingFromCriterion(c, evidenceById),
-    );
+    const narrative =
+      result.categoryNarratives[category.categoryId] ??
+      (category.assessedEffectiveWeight <= 0
+        ? "Limited public information was available for this category."
+        : `${CATEGORY_TITLES[category.categoryId] ?? category.name} findings are based on publicly available website information.`);
+
+    const findings: ReportCategoryFinding[] = category.criteria
+      .filter(
+        (c) =>
+          c.applicability === "APPLICABLE" && c.assessment !== "NOT_ASSESSED",
+      )
+      .slice(0, 6)
+      .map((criterion) => ({
+        id: criterion.criterionId,
+        title: criterion.name,
+        detail: criterion.rationale,
+        evidenceUrl: safeHttpUrl(criterion.sourceUrls[0]),
+        observedAtLabel: criterion.observationTimestamps[0]
+          ? formatUtcLabel(criterion.observationTimestamps[0])
+          : undefined,
+      }));
 
     const earned =
       result.status === "COMPLETE" || result.status === "PARTIAL"
@@ -155,38 +149,22 @@ function mapCategories(result: AssessmentResult): ReportCategoryResult[] {
       maxPoints: category.maxPoints,
       earned,
       status: categoryStatus(category),
-      summary:
-        category.methodologyReviewRequired
-          ? "Category requires methodology review; no score invented."
-          : category.assessedEffectiveWeight <= 0
-            ? "No assessed checks in this category."
-            : `Assessed ${category.assessedEffectiveWeight} of ${category.maxPoints} effective points` +
-              (category.unassessedEffectiveWeight > 0
-                ? ` (${category.unassessedEffectiveWeight} unassessed).`
-                : "."),
+      statusLabel: professionalCategoryStatusLabel(categoryStatus(category)),
+      summary: narrative,
       findings,
     };
   });
 }
 
 function mapStrengths(result: AssessmentResult): ReportStrength[] {
-  const evidenceById = evidenceLookup(result);
   return result.findings
     .filter((f) => f.kind === "strength")
     .slice(0, 12)
-    .map((finding) => {
-      const evidence = finding.evidenceIds
-        .map((id) => evidenceById.get(id))
-        .find(Boolean);
-      return {
-        id: finding.id,
-        title: finding.title,
-        explanation: finding.description,
-        evidenceLabel: evidence
-          ? `${safeHttpUrl(evidence.sourceUrl) ?? evidence.sourceUrl} · ${formatUtcLabel(evidence.observedAt)}`
-          : finding.evidenceIds[0],
-      };
-    });
+    .map((finding) => ({
+      id: finding.id,
+      title: finding.title,
+      explanation: finding.description,
+    }));
 }
 
 function severityForPriority(
@@ -196,106 +174,80 @@ function severityForPriority(
 }
 
 function mapImprovements(result: AssessmentResult): ReportImprovement[] {
-  const evidenceById = evidenceLookup(result);
   const fromWeaknesses = result.findings
     .filter((f) => f.kind === "weakness")
-    .map((finding) => {
-      const evidence = finding.evidenceIds
-        .map((id) => evidenceById.get(id))
-        .find(Boolean);
-      return {
-        id: finding.id,
-        title: finding.title,
-        severity: "medium" as IssueSeverity,
-        description: finding.description,
-        whyItMatters:
-          "Addressing this gap improves publicly observable digital presence.",
-        evidenceLabel: evidence
-          ? `${safeHttpUrl(evidence.sourceUrl) ?? "source"} · ${formatUtcLabel(evidence.observedAt)}`
-          : undefined,
-        recommendedAction: finding.description,
-      };
-    });
+    .map((finding) => ({
+      id: finding.id,
+      title: finding.title,
+      severity: "medium" as IssueSeverity,
+      description: finding.description,
+      whyItMatters:
+        "Improving this area can strengthen how prospective customers evaluate the business online.",
+      recommendedAction: finding.description,
+    }));
 
-  const fromRecs = result.recommendations.map((rec) => {
-    const evidence = rec.evidenceIds
-      .map((id) => evidenceById.get(id))
-      .find(Boolean);
-    return {
+  const weaknessTitles = new Set(fromWeaknesses.map((item) => item.title));
+  const fromRecs = result.recommendations
+    .filter((rec) => !weaknessTitles.has(rec.title))
+    .map((rec) => ({
       id: rec.id,
       title: rec.title,
       severity: severityForPriority(rec.priority),
       description: rec.description,
-      whyItMatters: "Supported recommendation grounded in collected evidence.",
-      evidenceLabel: evidence
-        ? `${safeHttpUrl(evidence.sourceUrl) ?? "source"} · ${formatUtcLabel(evidence.observedAt)}`
-        : undefined,
+      whyItMatters:
+        "This recommendation is based on publicly available website information reviewed for this report.",
       recommendedAction: rec.description,
-    };
-  });
+    }));
 
-  return [...fromWeaknesses, ...fromRecs].slice(0, 20);
+  return [...fromWeaknesses, ...fromRecs].slice(0, 12);
 }
 
 function mapActionPlan(result: AssessmentResult): ReportActionItem[] {
-  return result.recommendations.slice(0, 10).map((rec) => ({
+  if (result.nextSteps.length > 0) {
+    return result.nextSteps.slice(0, 8).map((step, index) => ({
+      id: `next-${index + 1}`,
+      action: step,
+      priority: index === 0 ? "high" : index < 3 ? "medium" : "low",
+      effort: index < 2 ? "medium" : "low",
+      impact: index === 0 ? "high" : "medium",
+    }));
+  }
+
+  return result.recommendations.slice(0, 8).map((rec) => ({
     id: rec.id,
     action: rec.title,
     priority: rec.priority,
-    effort: rec.priority === "high" ? "high" : rec.priority === "low" ? "low" : "medium",
+    effort:
+      rec.priority === "high" ? "high" : rec.priority === "low" ? "low" : "medium",
     impact: rec.priority,
   }));
 }
 
-function mapUnableToVerify(result: AssessmentResult): UnableToVerifyItem[] {
-  const items: UnableToVerifyItem[] = result.unassessedCriteria.map((id) => ({
-    id,
-    title: id,
-    detail:
-      "Not assessed — reliable evidence was unavailable. This is not treated as a failure.",
-  }));
+function mapAssessmentScope(result: AssessmentResult): UnableToVerifyItem[] {
+  const reasons = result.limitationReasons.filter(Boolean);
+  if (reasons.length === 0) return [];
 
-  for (const warning of result.warnings) {
-    items.push({
-      id: `warn-${warning.code}`,
-      title: warning.code,
-      detail: warning.message,
-    });
-  }
-
-  for (const reason of result.limitationReasons) {
-    items.push({
-      id: `limit-${items.length}`,
-      title: "Assessment limitation",
-      detail: reason,
-    });
-  }
-
-  return items;
+  return [
+    {
+      id: "assessment-scope",
+      title: "Assessment scope",
+      detail: reasons[0],
+    },
+  ];
 }
 
 function mapEvidenceItems(result: AssessmentResult): ReportEvidenceItem[] {
   return result.evidenceCatalog
-    .filter((item) => safeHttpUrl(item.sourceUrl) || item.kind === "website")
-    .slice(0, 40)
+    .filter((item) => safeHttpUrl(item.sourceUrl))
+    .slice(0, 20)
     .map((item) => {
       const url = safeHttpUrl(item.sourceUrl) ?? item.sourceUrl;
-      const device =
-        item.kind === "pagespeed" && item.deviceStrategy
-          ? ` (${item.deviceStrategy})`
-          : "";
       return {
         id: item.id,
-        label: `${item.kind}${device}: ${url}`,
+        label: item.title ? `${item.title}: ${url}` : url,
         observedAtLabel: formatUtcLabel(item.observedAt),
       };
     });
-}
-
-function coveragePercent(result: AssessmentResult): number {
-  const raw = result.evidenceCoverage.weightedCoverage * 100;
-  // Preserve one decimal when present; avoid inventing precision.
-  return Math.round(raw * 10) / 10;
 }
 
 /**
@@ -313,32 +265,18 @@ export function mapAssessmentToReport(
       ? maturityLabel(result.maturityBand.band, result.maturityBand.eligible)
       : null;
 
-  const policyPresent = result.scoringPolicyFlags.includes(
-    LIVE_SCORING_POLICY_ID,
-  );
-
-  const limitations = [
-    ...result.limitationReasons,
-    ...result.errors.map((e) => e.message),
-    ...(policyPresent ? [LIVE_SCORING_POLICY_EXPLANATION] : []),
-    ...result.scoringPolicyDisclosures,
-  ].filter((value, index, arr) => arr.indexOf(value) === index);
-
-  const integrationWarnings = [
-    ...result.warnings.map((w) => w.message),
-    result.integrationAvailability.pagespeed !== "available"
-      ? `PageSpeed: ${result.integrationAvailability.pagespeed}`
-      : null,
-    result.integrationAvailability.openai !== "available"
-      ? `OpenAI: ${result.integrationAvailability.openai}`
-      : null,
-  ].filter((value): value is string => Boolean(value));
+  const scopeItems = mapAssessmentScope(result);
+  const executiveSummary =
+    result.executiveSummary?.trim() ||
+    (outcome === "complete"
+      ? "This Digital Presence Report summarizes publicly available website information reviewed for the submitted business."
+      : "This Digital Presence Overview summarizes the publicly available website information that could be reviewed for this assessment.");
 
   return {
     id: result.assessmentId,
     isDemo: false,
     outcome,
-    businessName: result.business.businessName ?? "Business",
+    businessName: result.business.businessName ?? "Business website",
     website:
       safeHttpUrl(result.business.normalizedWebsiteUrl) ??
       safeHttpUrl(result.websiteUrl) ??
@@ -357,37 +295,42 @@ export function mapAssessmentToReport(
     reportId: result.assessmentId,
     scoringVersion: result.scoringVersion,
     statusLabel: statusLabelFor(result.status),
-    evidenceCoveragePercent: coveragePercent(result),
+    evidenceCoveragePercent: 0,
     overallScore,
     maxScore: result.totalMaxPoints,
     maturityBand,
+    executiveSummary,
     categories: mapCategories(result),
     strengths: mapStrengths(result),
     improvements: mapImprovements(result),
     actionPlan: mapActionPlan(result),
-    unableToVerify: mapUnableToVerify(result),
+    unableToVerify: scopeItems,
     methodology: {
       frameworkSummary: scoringFrameworkSummary,
       scoringVersion: result.scoringVersion,
       assessmentScope:
-        "Publicly observable website and business signals only. Not a measure of service quality or official search rankings.",
-      evidenceCoverageNote: `Weighted evidence coverage: ${coveragePercent(result)}% under ${result.scoringVersion}.`,
+        "This report reviews publicly available website information for the submitted URL. It is not a measure of service quality or official search rankings.",
+      evidenceCoverageNote:
+        "Findings are based on publicly available information retrieved for this assessment.",
       limitations:
-        limitations.length > 0
-          ? limitations
-          : [LIVE_SCORING_POLICY_EXPLANATION],
+        scopeItems.length > 0
+          ? [scopeItems[0].detail]
+          : [
+              "Some aspects of a website may not be visible through publicly available sources.",
+            ],
       sources: mapEvidenceItems(result).map((item) => ({
         id: item.id,
         label: item.label,
         observedAtLabel: item.observedAtLabel,
       })),
       partialAndLimitedExplanation:
-        "Partial audits omit an overall /100 score when evidence is incomplete. Limited Visibility Snapshots apply when a website cannot be confidently verified — they present available observations without inventing scores.",
+        "When available public information is incomplete, this report presents a Digital Presence Overview with supported observations instead of inventing an overall score.",
       disclaimer:
         "This report evaluates publicly observable digital presence, not actual service quality or official search-engine rankings.",
     },
-    scoringPolicyId: policyPresent ? LIVE_SCORING_POLICY_ID : null,
-    integrationWarnings,
+    // Internal validation marker only — never rendered in customer-facing copy.
+    scoringPolicyId: LIVE_SCORING_POLICY_ID,
+    integrationWarnings: [],
     evidenceItems: mapEvidenceItems(result),
   };
 }

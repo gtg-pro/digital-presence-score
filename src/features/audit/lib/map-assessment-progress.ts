@@ -6,11 +6,8 @@ const STAGE_MAP: Record<
   AuditProgressStageId
 > = {
   validating: "business-discovery",
-  crawling: "website-crawling",
-  collecting_evidence: "website-crawling",
-  pagespeed: "performance-analysis",
-  content_analysis: "public-trust-signals",
-  validating_findings: "scoring-validation",
+  retrieving: "website-crawling",
+  analyzing: "public-trust-signals",
   scoring: "scoring-validation",
   preparing_report: "report-generation",
 };

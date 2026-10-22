@@ -43,6 +43,8 @@ export type ReportCategoryResult = {
   /** null when Not Assessed — never invent a zero score */
   earned: number | null;
   status: CategoryAssessmentStatus;
+  /** Customer-facing status label (no internal diagnostic codes). */
+  statusLabel?: string;
   summary: string;
   findings: ReportCategoryFinding[];
 };
@@ -110,6 +112,8 @@ export type DigitalPresenceReport = {
   overallScore: number | null;
   maxScore: number;
   maturityBand: MaturityBand | null;
+  /** Professional executive summary for the report card. */
+  executiveSummary?: string;
   categories: ReportCategoryResult[];
   strengths: ReportStrength[];
   improvements: ReportImprovement[];

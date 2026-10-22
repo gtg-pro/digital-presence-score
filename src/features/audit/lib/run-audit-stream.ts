@@ -15,13 +15,8 @@ export type RunAuditStreamOptions = {
   businessModelHint?: AssessmentRequest["businessModelHint"];
   allowMissingWebsite?: boolean;
   signal?: AbortSignal;
-  skipPagespeed?: boolean;
-  skipOpenAI?: boolean;
-  /** Test injectables forwarded to runAssessment. */
-  crawlFn?: AssessmentRequest["crawlFn"];
-  pagespeedFn?: AssessmentRequest["pagespeedFn"];
-  analysisFn?: AssessmentRequest["analysisFn"];
-  scoringFn?: AssessmentRequest["scoringFn"];
+  /** Test injectable forwarded to runAssessment. */
+  openaiAuditFn?: AssessmentRequest["openaiAuditFn"];
   timeoutMs?: number;
   onEvent: (event: AuditStreamEvent) => void;
 };
@@ -42,12 +37,7 @@ export async function runAuditStream(
       businessModelHint: options.businessModelHint,
       allowMissingWebsite: options.allowMissingWebsite,
       signal,
-      skipPagespeed: options.skipPagespeed,
-      skipOpenAI: options.skipOpenAI,
-      crawlFn: options.crawlFn,
-      pagespeedFn: options.pagespeedFn,
-      analysisFn: options.analysisFn,
-      scoringFn: options.scoringFn,
+      openaiAuditFn: options.openaiAuditFn,
       timeoutMs: options.timeoutMs,
       onProgress: (progress) => {
         if (signal?.aborted) return;

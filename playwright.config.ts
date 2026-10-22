@@ -38,8 +38,6 @@ export default defineConfig({
       PORT: String(PORT),
       ALLOW_AUDIT_E2E_FIXTURES: "1",
       AUDIT_E2E_FIXTURE: process.env.AUDIT_E2E_FIXTURE ?? "complete",
-      AUDIT_SKIP_PAGESPEED: "1",
-      AUDIT_SKIP_OPENAI: "1",
       // Plain HTTP webServer — Secure cookies would not round-trip reliably.
       COOKIE_SECURE: "0",
       // Cookie report sessions can exceed Node's default 16KB header budget.

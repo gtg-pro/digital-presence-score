@@ -21,21 +21,18 @@ export function ReportHeader({
         </div>
       </div>
 
-      <h1 className="mt-6 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+      <p className="mt-6 text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
+        Digital Presence Audit Report
+      </p>
+      <h1 className="mt-2 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
         {report.businessName}
       </h1>
       <p className="mt-2 text-base text-muted-foreground">
-        {report.website ?? "Website not confidently verified"}
+        {report.website ?? "Website URL submitted for assessment"}
       </p>
 
-      <dl className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <MetaItem label="Audit date" value={report.auditDateLabel} />
-        <MetaItem label="Scoring version" value={report.scoringVersion} mono />
-        <MetaItem label="Report status" value={report.statusLabel} />
-        <MetaItem
-          label="Evidence coverage"
-          value={`${report.evidenceCoveragePercent}%`}
-        />
+      <dl className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <MetaItem label="Assessment date" value={report.auditDateLabel} />
       </dl>
     </header>
   );
@@ -44,26 +41,16 @@ export function ReportHeader({
 function MetaItem({
   label,
   value,
-  mono,
 }: {
   label: string;
   value: string;
-  mono?: boolean;
 }) {
   return (
     <div>
       <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
         {label}
       </dt>
-      <dd
-        className={
-          mono
-            ? "mt-1 font-mono text-sm text-foreground"
-            : "mt-1 text-sm font-medium text-foreground"
-        }
-      >
-        {value}
-      </dd>
+      <dd className="mt-1 text-sm font-medium text-foreground">{value}</dd>
     </div>
   );
 }

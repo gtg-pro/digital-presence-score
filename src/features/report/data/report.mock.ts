@@ -249,7 +249,7 @@ export const completeAuditDemo: DigitalPresenceReport = {
       id: "u1",
       title: "Restricted Instagram profile visibility",
       detail:
-        "Public profile details were limited at observation time and were marked Not Assessed.",
+        "Public profile details were limited at observation time.",
     },
   ],
   methodology: sharedMethodology("Approximately 92% of planned public checks had usable evidence in this demo fixture.", [
@@ -412,12 +412,12 @@ export const partialAuditDemo: DigitalPresenceReport = {
     {
       id: "pu1",
       title: "Local SEO Presence category",
-      detail: "Insufficient accessible service-page coverage — marked Not Assessed.",
+      detail: "Some service-page coverage could not be reviewed from available public information.",
     },
     {
       id: "pu2",
       title: "Content Authority category",
-      detail: "Key content URLs unavailable — marked Not Assessed.",
+      detail: "Some key content pages were not available for review.",
     },
     {
       id: "pu3",
@@ -519,7 +519,7 @@ export const limitedSnapshotDemo: DigitalPresenceReport = {
       title: "Establish or clarify a primary website",
       severity: "high",
       description:
-        "Without a confidently identified website, most website-based checks remain Not Assessed.",
+        "Without a confidently identified website, most website-based checks could not be reviewed.",
       whyItMatters:
         "Customers often start with a website to confirm services, trust, and contact options.",
       recommendedAction:
@@ -563,7 +563,7 @@ export const limitedSnapshotDemo: DigitalPresenceReport = {
     {
       id: "lu1",
       title: "Website identity",
-      detail: "No website could be confidently verified — website categories remain Not Assessed.",
+      detail: "No website could be confidently verified from available public information.",
     },
     {
       id: "lu2",

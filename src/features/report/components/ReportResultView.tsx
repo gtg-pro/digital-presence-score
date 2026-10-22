@@ -1,15 +1,14 @@
 import { Container } from "@/components/ui/container";
 import type { DigitalPresenceReport } from "@/features/report/types/report.types";
 
+import { ActionPlanSection } from "./ActionPlanSection";
 import { CategoryBreakdown } from "./CategoryBreakdown";
 import { ImprovementSection } from "./ImprovementSection";
-import { MethodologySection } from "./MethodologySection";
 import { OverallScore } from "./OverallScore";
 import { ReportActions } from "./ReportActions";
 import { ReportHeader } from "./ReportHeader";
 import { StrategyCallCTA } from "./StrategyCallCTA";
 import { StrengthsSection } from "./StrengthsSection";
-import { UnableToVerifySection } from "./UnableToVerifySection";
 
 export type ReportResultViewProps = {
   report: DigitalPresenceReport;
@@ -39,8 +38,9 @@ export function ReportResultView({
         {report.outcome !== "limited" ? (
           <ImprovementSection report={report} />
         ) : null}
-        <UnableToVerifySection report={report} />
-        <MethodologySection report={report} />
+        {report.outcome !== "limited" ? (
+          <ActionPlanSection report={report} />
+        ) : null}
         <ReportActions reportId={report.id} isDemo={report.isDemo} />
         <StrategyCallCTA />
       </div>

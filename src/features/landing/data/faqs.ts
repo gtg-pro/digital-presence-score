@@ -18,19 +18,19 @@ export const faqs: FAQItem[] = [
     id: "how-score-calculated",
     question: "How is my Digital Presence Score calculated?",
     answer:
-      "Your score is calculated using a structured 100-point assessment framework (strict-v1.0). Each category is evaluated against predefined criteria using available evidence. A complete numerical score is displayed only when sufficient information can be verified.",
+      "Your score uses a structured 100-point framework across five categories. OpenAI retrieves available public website information, then each criterion is scored with fixed PASS/PARTIAL/FAIL anchors. A complete numerical score is shown only when enough public information supports publishing one.",
   },
   {
     id: "what-info-needed",
     question: "What information do I need to get started?",
     answer:
-      "You can start with your website URL or provide basic business information. Additional details, such as your industry, service area, and public business profile links, may help complete the assessment.",
+      "Start with your website URL. Optional business details can help label the report, but the audit focuses on publicly available information about the submitted website.",
   },
   {
     id: "unverified-information",
     question: "What happens if some information cannot be verified?",
     answer:
-      "Unavailable information is marked as Not Assessed rather than automatically treated as a failure. If there isn't enough evidence for a complete score, you'll receive a Partial Audit or Limited Visibility Snapshot.",
+      "Missing information is not automatically treated as a failure. When available public information is incomplete, you receive a Digital Presence Overview with supported findings instead of an invented overall score.",
   },
   {
     id: "google-rankings",
@@ -54,7 +54,7 @@ export const faqs: FAQItem[] = [
     id: "no-website",
     question: "Can I use this tool if my business doesn't have a website?",
     answer:
-      "Yes. You can provide basic business information and an available public business profile. If a website cannot be confidently identified, the application can provide a Limited Visibility Snapshot rather than inventing a complete website score.",
+      "A website URL is required for the OpenAI website audit. If the site cannot be inspected from available public information, you receive a limited overview rather than an invented complete score.",
   },
   {
     id: "session-limits",

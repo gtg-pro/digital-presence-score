@@ -6,24 +6,16 @@ Technologies used specifically for the digital-presence auditing pipeline.
 
 | Service | Env var | Role |
 |---------|---------|------|
-| **OpenAI** | `OPENAI_API_KEY`, optional `OPENAI_MODEL` | Structured content analysis grounded in crawl evidence. Does not invent the numerical score. |
-| **Google PageSpeed Insights** | `GOOGLE_PAGESPEED_API_KEY` | Mobile and desktop performance metrics (lab/field where available). |
+| **OpenAI** | `OPENAI_API_KEY`, optional `OPENAI_MODEL` | Primary audit provider. Two-step Responses API flow: (1) `web_search` research brief, (2) structured JSON scoring. OpenAI does not allow web_search and JSON mode in one request. |
 | **Report session crypto** | `REPORT_SESSION_SECRET` | Encrypts short-lived live report cookies and audit handoff tokens. |
 
-## Crawl, extract, and analyze
+## Analyze and score
 
 | Technology | Role |
 |------------|------|
-| **Playwright Chromium** | Bounded, SSRF-aware website crawling and evidence capture. |
-| **Cheerio** | HTML parsing and structured field extraction from crawled pages. |
-| **OpenAI SDK** | Client for structured outputs used in content analysis. |
-| **Zod** | Schema validation for OpenAI structured responses and related contracts. |
-
-## Scoring
-
-| Technology | Role |
-|------------|------|
-| **strict-v1.0 scoring engine** | Deterministic category/criterion scoring (100 points across five categories). Absolute points earned; unassessed checks are not automatic fails. |
+| **OpenAI SDK** | Server-only client for Responses API + web_search + structured JSON outputs. |
+| **Zod** | Runtime validation of OpenAI structured audit payloads. |
+| **openai-web-v1.0 scoring** | Deterministic mapping of PASS/PARTIAL/FAIL/NOT_ASSESSED criterion anchors to the five-category, 100-point Report Card. OpenAI does not invent numeric totals. |
 
 ## Live audit delivery
 
@@ -33,14 +25,15 @@ Technologies used specifically for the digital-presence auditing pipeline.
 | **Server Actions** | Starts the pending audit session and finalizes encrypted report handoff. |
 | **httpOnly encrypted cookies** | Holds the ephemeral live report (~30 minutes). |
 | **AES-GCM** (with compression) | Seals pending-session, handoff, and report cookie payloads. |
-| **Playwright Chromium** | Also used to render PDF/PNG exports from the validated report snapshot. |
+| **Playwright Chromium** | Used only for PDF/PNG export rendering and end-to-end browser tests — not for production website crawling. |
 
 ## What the audit evaluates (summary)
 
-- **Website Experience** (25) — usability, measured performance, readability, structure, business info  
-- **Local SEO Presence** (25) — intent/geo metadata, service coverage, crawlability/schema, discovery, contact consistency  
-- **Reputation & Trust** (20) — evidenced reviews/credentials/testimonials/activity  
-- **Content Authority** (15) — depth, education, freshness, topical breadth  
-- **Conversion Readiness** (15) — CTAs, inquiry path, next steps, trust near CTAs, mobile completion  
+- **Website Experience** (25) — clarity, navigation, readability, service information, UX signals supported by retrieved public information  
+- **Local SEO Presence** (25) — search-relevant content, service/location relevance, titles/headings, local discovery signals when available  
+- **Reputation & Trust** (20) — visible testimonials, credibility signals, published credentials/case content (not fabricated third-party proof)  
+- **Content Authority** (15) — service-page quality, depth, resources/FAQs, topical coverage  
+- **Conversion Readiness** (15) — CTA clarity, contact/inquiry paths, conversion friction  
 
 Outcomes: **COMPLETE**, **PARTIAL**, or **LIMITED_VISIBILITY**.
+Numerical overall scores and maturity bands are published only when evidence eligibility thresholds are met.

@@ -170,14 +170,7 @@ export async function POST(request: Request): Promise<Response> {
           businessModelHint: validated.body.businessModelHint,
           allowMissingWebsite: validated.allowMissingWebsite,
           signal: abort.signal,
-          // When E2E injectables are present, use them (do not skip those stages).
-          // Otherwise honor AUDIT_SKIP_* for local/dev without provider keys.
-          skipPagespeed: e2e ? false : process.env.AUDIT_SKIP_PAGESPEED === "1",
-          skipOpenAI: e2e ? false : process.env.AUDIT_SKIP_OPENAI === "1",
-          crawlFn: e2e?.crawlFn,
-          pagespeedFn: e2e?.pagespeedFn,
-          analysisFn: e2e?.analysisFn,
-          scoringFn: e2e?.scoringFn,
+          openaiAuditFn: e2e?.openaiAuditFn,
           onEvent: (event) => {
             if (event.type === "complete") completed = true;
             send(event);

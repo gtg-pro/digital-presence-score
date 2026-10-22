@@ -3,10 +3,21 @@ import { expect, test } from "@playwright/test";
 test.describe("accessibility and responsive smoke", () => {
   test("homepage has landmark structure and keyboard-focusable CTA", async ({
     page,
-  }) => {
+  }, testInfo) => {
     await page.goto("/");
     await expect(page.getByRole("banner").first()).toBeVisible();
     await expect(page.locator("main, #main-content, [role='main']").first()).toBeVisible();
+
+    if (testInfo.project.name === "chromium-mobile") {
+      await page.getByRole("button", { name: /open menu/i }).click();
+      const contact = page
+        .getByRole("navigation", { name: /mobile/i })
+        .getByRole("link", { name: /^contact$/i });
+      await contact.focus();
+      await expect(contact).toBeFocused();
+      return;
+    }
+
     const contact = page
       .getByRole("navigation", { name: /primary/i })
       .getByRole("link", { name: /^contact$/i });
@@ -35,8 +46,9 @@ test.describe("accessibility and responsive smoke", () => {
 
   test("landing sample report preview is present", async ({ page }) => {
     await page.goto("/#sample-report");
+    await expect(page.locator("#sample-report")).toBeVisible();
     await expect(
-      page.locator("#sample-report").getByText("Sample Report", { exact: true }),
+      page.locator("#sample-report").getByText("Sample Report", { exact: true }).first(),
     ).toBeVisible();
   });
 

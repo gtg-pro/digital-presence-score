@@ -1,8 +1,6 @@
 import "server-only";
 
-import { SCORING_CONFIG_STRICT_V1 } from "@/lib/audit/scoring/scoring-config";
 import type { ScoringResult } from "@/lib/audit/scoring/scoring.types";
-import type { EvidenceValidationResult } from "@/lib/audit/validation/evidence-validator";
 
 export type AssessmentValidationIssue = {
   code:
@@ -36,27 +34,13 @@ const EXPECTED_MAXIMA: Record<string, number> = {
  */
 export function validateScoringResult(
   scoring: ScoringResult,
-  evidence: EvidenceValidationResult,
 ): AssessmentValidationResult {
   const issues: AssessmentValidationIssue[] = [];
 
-  if (scoring.scoringVersion !== SCORING_CONFIG_STRICT_V1.version) {
-    // Still allow alternate versions if registered, but require presence.
-  }
   if (!scoring.scoringVersion) {
     issues.push({
       code: "missing_scoring_version",
-      message: "Scoring result is missing scoring version.",
-    });
-  }
-
-  if (
-    !scoring.policyFlags.includes("unassessed_weight_uses_absolute_points_earned")
-  ) {
-    issues.push({
-      code: "missing_policy_disclosure",
-      message:
-        "strict-v1.0 scoring-policy disclosure unassessed_weight_uses_absolute_points_earned is missing.",
+      message: "Scoring result is missing scoringVersion.",
     });
   }
 
@@ -70,20 +54,13 @@ export function validateScoringResult(
     }
   }
 
-  if (scoring.totalMaxPoints !== 100) {
-    issues.push({
-      code: "category_maxima_mismatch",
-      message: `totalMaxPoints ${scoring.totalMaxPoints} !== 100.`,
-    });
-  }
-
   if (
     scoring.totalScore !== null &&
-    scoring.totalScore > scoring.totalMaxPoints
+    (scoring.totalScore < 0 || scoring.totalScore > scoring.totalMaxPoints)
   ) {
     issues.push({
       code: "total_exceeds_100",
-      message: `totalScore ${scoring.totalScore} exceeds totalMaxPoints.`,
+      message: `totalScore ${scoring.totalScore} outside 0–${scoring.totalMaxPoints}.`,
     });
   }
 
@@ -109,15 +86,14 @@ export function validateScoringResult(
     }
   }
 
-  // Fabrication guard: COMPLETE without confirmed website / pages.
   if (
     scoring.status === "COMPLETE" &&
-    (!evidence.websiteConfirmed || evidence.verifiedPageCount < 1)
+    scoring.coverage.verifiedWebsitePages < 1
   ) {
     issues.push({
       code: "fabricated_score_suspected",
       message:
-        "COMPLETE score produced without confirmed website and verified pages.",
+        "COMPLETE score produced without verified public website retrieval.",
     });
   }
 

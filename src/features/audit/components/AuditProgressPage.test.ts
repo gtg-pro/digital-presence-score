@@ -19,10 +19,7 @@ function liveSnapshotWithProgress(): AuditProgressSnapshot {
         index === 2
           ? ("not_assessed" as const)
           : ("completed" as const),
-      detail:
-        index === 2
-          ? "PageSpeed unavailable; marked not assessed."
-          : "Stage finished.",
+      detail: index === 2 ? "Limited public information for this step." : "Stage finished.",
     })),
   };
 }

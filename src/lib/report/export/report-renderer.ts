@@ -1,18 +1,11 @@
 import "server-only";
 
 import type { DigitalPresenceReport } from "@/features/report/types/report.types";
-import { LIVE_SCORING_POLICY_EXPLANATION } from "@/features/report/adapters/assessment-to-report";
 import { escapeHtml } from "@/lib/report/export/export-validation";
 import { EXPORT_PAGE_WIDTH_PX } from "@/lib/report/export/export.types";
 
 function scoreDisplay(score: number): string {
-  // Preserve source precision (e.g. 80.8) without inventing trailing zeros.
   return String(score);
-}
-
-function listItems(items: string[]): string {
-  if (items.length === 0) return "<p class=\"muted\">None listed.</p>";
-  return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
 }
 
 /**
@@ -21,7 +14,11 @@ function listItems(items: string[]): string {
  */
 export function renderReportExportHtml(report: DigitalPresenceReport): string {
   const demoBanner = report.isDemo
-    ? `<p class="banner">Illustrative demo report — not a verified assessment result.</p>`
+    ? `<p class="banner">Illustrative sample report — not a verified assessment result.</p>`
+    : "";
+
+  const summary = report.executiveSummary
+    ? `<p>${escapeHtml(report.executiveSummary)}</p>`
     : "";
 
   const scoreBlock =
@@ -30,18 +27,16 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
           <h2>Overall digital presence score</h2>
           <p class="score">${escapeHtml(scoreDisplay(report.overallScore))}<span class="muted">/${report.maxScore}</span></p>
           ${report.maturityBand ? `<p class="band">${escapeHtml(report.maturityBand)}</p>` : ""}
-          <p class="muted">Evidence coverage: ${escapeHtml(String(report.evidenceCoveragePercent))}%</p>
+          ${summary}
         </section>`
       : report.outcome === "partial"
         ? `<section class="card avoid-break">
-            <h2>Partial Audit</h2>
-            <p>Some checks could not be completed. Unverified areas are shown as Not Assessed rather than counted as failures. No overall /100 score or maturity band is displayed.</p>
-            <p class="muted">Evidence coverage: ${escapeHtml(String(report.evidenceCoveragePercent))}%</p>
+            <h2>Digital Presence Overview</h2>
+            ${summary || `<p>This overview shares the publicly supported observations available for this website. An overall score out of 100 is not shown when available information is incomplete.</p>`}
           </section>`
         : `<section class="card avoid-break">
-            <h2>Limited Visibility Snapshot</h2>
-            <p>A business website could not be confidently verified. This snapshot contains only limited available information. No numerical score is displayed.</p>
-            <p class="muted">Evidence coverage: ${escapeHtml(String(report.evidenceCoveragePercent))}%</p>
+            <h2>Limited Digital Presence Overview</h2>
+            ${summary || `<p>A complete numerical digital presence score could not be published because public website information was insufficient for this run.</p>`}
           </section>`;
 
   const categoriesHtml =
@@ -55,36 +50,10 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
                 category.earned === null
                   ? "—"
                   : scoreDisplay(category.earned);
-              const findings =
-                category.findings.length === 0
-                  ? "<p class=\"muted\">No supporting findings listed.</p>"
-                  : `<ul class="findings">${category.findings
-                      .map((finding) => {
-                        const evidenceBits = [
-                          finding.evidenceUrl
-                            ? `Source: ${escapeHtml(finding.evidenceUrl)}`
-                            : null,
-                          finding.observedAtLabel
-                            ? `Observed: ${escapeHtml(finding.observedAtLabel)}`
-                            : null,
-                          finding.collectionMethod
-                            ? `Method: ${escapeHtml(finding.collectionMethod)}`
-                            : null,
-                        ]
-                          .filter(Boolean)
-                          .join(" · ");
-                        return `<li class="avoid-break">
-                          <strong>${escapeHtml(finding.title)}</strong>
-                          <p>${escapeHtml(finding.detail)}</p>
-                          ${evidenceBits ? `<p class="muted small">${evidenceBits}</p>` : ""}
-                        </li>`;
-                      })
-                      .join("")}</ul>`;
               return `<article class="card avoid-break">
                 <h3>${escapeHtml(category.title)}</h3>
-                <p class="mono">${escapeHtml(earned)}/${category.maxPoints} · ${escapeHtml(category.status.replace(/_/g, " "))}</p>
+                <p class="mono">${escapeHtml(earned)}/${category.maxPoints}</p>
                 <p>${escapeHtml(category.summary)}</p>
-                ${findings}
               </article>`;
             })
             .join("")}
@@ -94,13 +63,12 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
     report.outcome === "limited" || report.strengths.length === 0
       ? ""
       : `<section class="block avoid-break">
-          <h2>Strengths</h2>
+          <h2>Key strengths</h2>
           <ul>${report.strengths
             .map(
               (item) => `<li class="avoid-break">
                 <strong>${escapeHtml(item.title)}</strong>
                 <p>${escapeHtml(item.explanation)}</p>
-                ${item.evidenceLabel ? `<p class="muted small">${escapeHtml(item.evidenceLabel)}</p>` : ""}
               </li>`,
             )
             .join("")}</ul>
@@ -110,7 +78,7 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
     report.outcome === "limited" || report.improvements.length === 0
       ? ""
       : `<section class="block">
-          <h2>Improvement opportunities</h2>
+          <h2>Areas for improvement</h2>
           <ul>${report.improvements
             .map(
               (item) => `<li class="avoid-break">
@@ -122,122 +90,71 @@ export function renderReportExportHtml(report: DigitalPresenceReport): string {
             .join("")}</ul>
         </section>`;
 
-  const unableHtml =
-    report.unableToVerify.length === 0
+  const nextStepsHtml =
+    report.outcome === "limited" || report.actionPlan.length === 0
       ? ""
-      : `<section class="block">
-          <h2>Unable to verify</h2>
-          <p class="muted">Not Assessed does not automatically mean the business failed the check.</p>
-          <ul>${report.unableToVerify
+      : `<section class="block avoid-break">
+          <h2>Suggested next steps</h2>
+          <ol>${report.actionPlan
             .map(
               (item) =>
-                `<li class="avoid-break"><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.detail)}</p></li>`,
+                `<li class="avoid-break"><p>${escapeHtml(item.action)}</p></li>`,
             )
-            .join("")}</ul>
+            .join("")}</ol>
         </section>`;
-
-  const methodology = report.methodology;
-  const policyNote = report.scoringPolicyId
-    ? `<p><strong>Scoring policy:</strong> ${escapeHtml(report.scoringPolicyId)}</p>
-       <p>${escapeHtml(LIVE_SCORING_POLICY_EXPLANATION)}</p>`
-    : report.isDemo
-      ? ""
-      : `<p>${escapeHtml(LIVE_SCORING_POLICY_EXPLANATION)}</p>`;
-
-  const methodologyHtml = `<section class="block">
-      <h2>Methodology &amp; limitations</h2>
-      <p>${escapeHtml(methodology.frameworkSummary)}</p>
-      <p><strong>Scoring version:</strong> <span class="mono">${escapeHtml(methodology.scoringVersion)}</span></p>
-      <p>${escapeHtml(methodology.assessmentScope)}</p>
-      <p>${escapeHtml(methodology.evidenceCoverageNote)}</p>
-      ${policyNote}
-      <h3>Limitations</h3>
-      ${listItems(methodology.limitations)}
-      <h3>Sources</h3>
-      ${
-        methodology.sources.length === 0
-          ? "<p class=\"muted\">No sources listed.</p>"
-          : `<ul>${methodology.sources
-              .map(
-                (source) =>
-                  `<li class="url-break">${escapeHtml(source.label)} — ${escapeHtml(source.observedAtLabel)}</li>`,
-              )
-              .join("")}</ul>`
-      }
-      <p>${escapeHtml(methodology.partialAndLimitedExplanation)}</p>
-      <p class="muted">${escapeHtml(methodology.disclaimer)}</p>
-    </section>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(report.businessName)} — Digital Presence Report</title>
   <style>
-    @page { size: A4; margin: 16mm 14mm; }
+    :root { color-scheme: light; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 24px;
-      width: ${EXPORT_PAGE_WIDTH_PX}px;
-      max-width: 100%;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 12px;
-      line-height: 1.5;
       color: #111;
       background: #fff;
+      width: ${EXPORT_PAGE_WIDTH_PX}px;
+      padding: 32px 40px 48px;
+      line-height: 1.45;
     }
-    h1 { font-size: 22px; margin: 0 0 6px; font-weight: 600; }
-    h2 { font-size: 16px; margin: 0 0 10px; font-weight: 600; page-break-after: avoid; }
-    h3 { font-size: 13px; margin: 0 0 6px; font-weight: 600; page-break-after: avoid; }
+    h1, h2, h3 { font-family: system-ui, -apple-system, Segoe UI, sans-serif; }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    h2 { font-size: 18px; margin: 0 0 12px; }
+    h3 { font-size: 15px; margin: 0 0 8px; }
     p { margin: 0 0 8px; }
-    ul, ol { margin: 0 0 10px; padding-left: 18px; }
-    li { margin-bottom: 6px; }
-    .meta { color: #333; margin-bottom: 16px; }
-    .meta span { display: inline-block; margin-right: 14px; margin-bottom: 4px; }
-    .banner {
-      border: 1px solid #111;
-      padding: 8px 10px;
-      margin-bottom: 16px;
-      font-size: 11px;
-      background: #f5f5f5;
-    }
-    .card {
-      border: 1px solid #ccc;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      background: #fff;
-    }
-    .block { margin-bottom: 18px; }
-    .score { font-size: 28px; font-weight: 700; margin: 4px 0 8px; font-family: ui-monospace, monospace; }
-    .band { font-size: 14px; font-weight: 600; }
+    ul, ol { margin: 0; padding-left: 18px; }
+    li { margin-bottom: 8px; }
     .muted { color: #555; }
-    .small { font-size: 11px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-    .url-break, .findings p { overflow-wrap: anywhere; word-break: break-word; }
+    .small { font-size: 12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+    .banner { background: #f3f3f3; border: 1px solid #ddd; padding: 10px 12px; margin-bottom: 16px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+    .block { margin-top: 22px; }
+    .score { font-size: 36px; font-weight: 700; margin: 4px 0 8px; }
+    .band { font-weight: 600; }
+    .header { margin-bottom: 20px; }
+    .meta { color: #555; font-size: 13px; margin-top: 6px; }
     .avoid-break { break-inside: avoid; page-break-inside: avoid; }
-    header { margin-bottom: 18px; border-bottom: 1px solid #111; padding-bottom: 12px; }
+    .findings { margin-top: 8px; }
   </style>
 </head>
 <body>
-  <header class="avoid-break">
-    <p class="muted small">Digital Presence Report Card</p>
+  ${demoBanner}
+  <header class="header avoid-break">
+    <p class="muted small">Digital Presence Audit Report</p>
     <h1>${escapeHtml(report.businessName)}</h1>
-    <p>${escapeHtml(report.website ?? "Website not confidently verified")}</p>
-    <div class="meta">
-      <span>Status: <strong>${escapeHtml(report.statusLabel)}</strong></span>
-      <span>Date: ${escapeHtml(report.auditDateLabel)}</span>
-      <span>Scoring: <span class="mono">${escapeHtml(report.scoringVersion)}</span></span>
-      <span>Coverage: ${escapeHtml(String(report.evidenceCoveragePercent))}%</span>
-    </div>
-    ${demoBanner}
+    <p class="meta">${escapeHtml(report.website ?? "Website submitted for assessment")}</p>
+    <p class="meta">${escapeHtml(report.auditDateLabel)} · ${escapeHtml(report.statusLabel)}</p>
   </header>
   ${scoreBlock}
   ${categoriesHtml}
   ${strengthsHtml}
   ${improvementsHtml}
-  ${unableHtml}
-  ${methodologyHtml}
+  ${nextStepsHtml}
 </body>
 </html>`;
 }

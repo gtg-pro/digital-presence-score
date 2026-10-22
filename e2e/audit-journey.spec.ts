@@ -47,14 +47,15 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
 
     await firstAuditPost;
 
-    // Fixture audits can finish and hard-navigate before stage DOM is asserted.
+    // Fixture audits can finish and hard-navigate before progress UI is asserted.
     await Promise.race([
       page.waitForURL(/\/report\/live-/, { timeout: 60_000 }),
       page
-        .locator(
-          '[data-stage-id="business-discovery"]:not([data-stage-status="pending"])',
-        )
+        .locator('[data-audit-progress-active="yes"]')
         .waitFor({ state: "visible", timeout: 60_000 }),
+      page
+        .locator("[data-audit-fetch-initiated='yes']")
+        .waitFor({ state: "attached", timeout: 60_000 }),
     ]);
 
     // Production webServer (no Strict Mode double-invoke): exactly one audit POST.
@@ -89,7 +90,9 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
     await page.getByRole("button", { name: /get my free report/i }).click();
     await expect(page).toHaveURL(/\/audit\/progress/);
 
-    await expect(page.getByText(/validating|crawling|assessment/i).first()).toBeVisible({
+    await expect(
+      page.getByText(/website audit is in progress|analyzing available website information|assessment/i).first(),
+    ).toBeVisible({
       timeout: 30_000,
     });
 
@@ -148,7 +151,9 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
     await page.getByPlaceholder(/example-service/i).fill("not a url");
     await page.getByRole("button", { name: /get my free report/i }).click();
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole("alert")).toContainText(/valid website url/i);
+    await expect(
+      page.locator("form").getByRole("alert"),
+    ).toContainText(/valid website url/i);
   });
 
   test("retired /audit page redirects to homepage", async ({ page }, testInfo) => {
@@ -209,7 +214,9 @@ test.describe("Prompt 23 end-to-end audit journey", () => {
     await expect(
       page.getByText(/missing, expired, or could not be verified/i),
     ).toBeVisible();
-    await expect(page.getByText(/demo fixture data is intentionally not shown/i)).toBeVisible();
+    await expect(
+      page.getByText(/never replaced with demo fixture data/i),
+    ).toBeVisible();
   });
 
   test("admin dashboard routes are gone", async ({ page }, testInfo) => {

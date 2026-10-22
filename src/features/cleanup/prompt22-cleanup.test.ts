@@ -15,38 +15,14 @@ import {
 import { siteConfig } from "@/config/site";
 import { runAssessment } from "@/lib/audit/orchestration/assessment";
 import {
-  brochureFixture,
-  blockedWebsiteFixture,
-  strongLocalServiceFixture,
-} from "@/lib/audit/scoring/test/fixtures";
-import type { CrawlResult } from "@/features/audit/types/evidence.types";
-import type { AIAnalysisResult } from "@/lib/audit/integrations/openai/analysis.types";
-import type { PerformanceResult } from "@/lib/audit/integrations/pagespeed/pagespeed.types";
-import { scoreDigitalPresence } from "@/lib/audit/scoring/scoring-engine";
+  completeOpenAIAuditPayload,
+  limitedOpenAIAuditPayload,
+  mockOpenAIAuditSuccess,
+  partialOpenAIAuditPayload,
+} from "@/lib/audit/openai-audit/fixtures";
+import { OPENAI_AUDIT_VERSION } from "@/lib/audit/openai-audit/openai-audit.types";
 
 const root = path.resolve(__dirname, "../../..");
-
-function inject(fixture: {
-  crawl: CrawlResult;
-  performance: PerformanceResult | null;
-  analysis: AIAnalysisResult | null;
-}) {
-  const candidate =
-    fixture.crawl.website?.normalizedSeedUrl ??
-    fixture.crawl.request.normalizedUrl ??
-    "https://example.com/";
-  const websiteUrl = candidate.includes("localhost")
-    ? "https://example.com/"
-    : candidate;
-  return {
-    websiteUrl,
-    businessName: "Fixture Business",
-    assessedAt: "2026-10-21T06:00:00.000Z",
-    crawlFn: async () => fixture.crawl,
-    pagespeedFn: async () => fixture.performance,
-    analysisFn: async () => fixture.analysis,
-  };
-}
 
 function collectSourceFiles(dir: string, out: string[] = []): string[] {
   if (!existsSync(dir)) return out;
@@ -107,44 +83,34 @@ describe("Prompt 22 — sample vs live report isolation", () => {
   });
 
   it("does not fall back live assessments to demo fixtures", async () => {
-    const result = await runAssessment(inject(strongLocalServiceFixture()));
+    const result = await runAssessment({
+      websiteUrl: "https://example-plumbing.example/",
+      openaiAuditFn: async () =>
+        mockOpenAIAuditSuccess(completeOpenAIAuditPayload()),
+    });
     const mapped = mapAssessmentToReport(result);
     expect(mapped.isDemo).toBe(false);
     expect(mapped.id.startsWith("demo")).toBe(false);
   });
 
   it("preserves original COMPLETE scores without React recalculation artifacts", async () => {
-    const result = await runAssessment(inject(strongLocalServiceFixture()));
+    const result = await runAssessment({
+      websiteUrl: "https://example-plumbing.example/",
+      assessedAt: "2026-10-21T06:00:00.000Z",
+      openaiAuditFn: async () =>
+        mockOpenAIAuditSuccess(completeOpenAIAuditPayload()),
+    });
     const mapped = mapAssessmentToReport(result);
     expect(mapped.overallScore).toBe(result.overallScore);
-    expect(mapped.scoringVersion).toBe("strict-v1.0");
-    expect(result.scoringPolicyFlags).toContain(
-      "unassessed_weight_uses_absolute_points_earned",
-    );
+    expect(mapped.scoringVersion).toBe(OPENAI_AUDIT_VERSION);
     expect(mapped.methodology.scoringVersion).toBe(result.scoringVersion);
   });
 
   it("keeps PARTIAL overall score null", async () => {
-    const fixture = brochureFixture();
     const result = await runAssessment({
-      ...inject(fixture),
-      scoringFn: (input) => {
-        const scored = scoreDigitalPresence({
-          ...input,
-          assessedAt: "2026-10-21T06:00:00.000Z",
-        });
-        return {
-          ...scored,
-          status: "PARTIAL",
-          totalScore: null,
-          maturity: {
-            band: null,
-            label: null,
-            eligible: false,
-            reason: "Partial",
-          },
-        };
-      },
+      websiteUrl: "https://brochure.example/",
+      openaiAuditFn: async () =>
+        mockOpenAIAuditSuccess(partialOpenAIAuditPayload()),
     });
     const mapped = mapAssessmentToReport(result);
     expect(mapped.outcome).toBe("partial");
@@ -153,7 +119,11 @@ describe("Prompt 22 — sample vs live report isolation", () => {
   });
 
   it("keeps LIMITED_VISIBILITY overall score null", async () => {
-    const result = await runAssessment(inject(blockedWebsiteFixture()));
+    const result = await runAssessment({
+      websiteUrl: "https://unreachable.example/",
+      openaiAuditFn: async () =>
+        mockOpenAIAuditSuccess(limitedOpenAIAuditPayload()),
+    });
     const mapped = mapAssessmentToReport(result);
     expect(mapped.outcome).toBe("limited");
     expect(mapped.overallScore).toBeNull();

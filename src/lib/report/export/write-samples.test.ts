@@ -11,9 +11,12 @@ describe("export sample artifacts", () => {
     const report = reportDemoFixtures.complete;
     const pdf = await exportReport({ format: "pdf", report, timeoutMs: 60_000 });
     const png = await exportReport({ format: "png", report, timeoutMs: 60_000 });
-    expect(pdf.ok).toBe(true);
-    expect(png.ok).toBe(true);
-    if (!pdf.ok || !png.ok) return;
+    if (!pdf.ok) {
+      expect.fail(`PDF export failed: ${pdf.code} — ${pdf.message}`);
+    }
+    if (!png.ok) {
+      expect.fail(`PNG export failed: ${png.code} — ${png.message}`);
+    }
 
     const root = process.cwd();
     writeFileSync(

@@ -16,7 +16,8 @@ export type EvidenceExtractionMethod =
   | "http_headers"
   | "sitemap_xml"
   | "robots_txt"
-  | "manual_fixture";
+  | "manual_fixture"
+  | "openai_web_search";
 
 export type EvidenceSource = {
   url: string;

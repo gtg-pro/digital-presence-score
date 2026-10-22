@@ -31,7 +31,7 @@ export function MethodologySection({
           id="methodology-heading"
           className="text-lg font-semibold tracking-tight text-foreground sm:text-xl"
         >
-          Report methodology
+          How this report was prepared
         </h2>
         <ChevronDown
           className={cn("size-5 shrink-0 transition-transform", open && "rotate-180")}
@@ -50,51 +50,29 @@ export function MethodologySection({
             <dd className="mt-1 text-muted-foreground">{methodology.frameworkSummary}</dd>
           </div>
           <div>
-            <dt className="font-medium text-foreground">Scoring version</dt>
-            <dd className="mt-1 font-mono text-muted-foreground">
-              {methodology.scoringVersion}
-            </dd>
-          </div>
-          <div>
             <dt className="font-medium text-foreground">Assessment scope</dt>
             <dd className="mt-1 text-muted-foreground">{methodology.assessmentScope}</dd>
           </div>
-          <div>
-            <dt className="font-medium text-foreground">Evidence coverage</dt>
-            <dd className="mt-1 text-muted-foreground">
-              {methodology.evidenceCoverageNote}
-            </dd>
-          </div>
-          <div>
-            <dt className="font-medium text-foreground">Limitations</dt>
-            <dd className="mt-1">
-              <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
-                {methodology.limitations.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-          <div>
-            <dt className="font-medium text-foreground">Sources & observation dates</dt>
-            <dd className="mt-1">
-              <ul className="space-y-1 text-muted-foreground">
-                {methodology.sources.map((source) => (
-                  <li key={source.id}>
-                    {source.label} — {source.observedAtLabel}
-                  </li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-          <div>
-            <dt className="font-medium text-foreground">
-              Partial and limited results
-            </dt>
-            <dd className="mt-1 text-muted-foreground">
-              {methodology.partialAndLimitedExplanation}
-            </dd>
-          </div>
+          {methodology.limitations.length > 0 ? (
+            <div>
+              <dt className="font-medium text-foreground">Notes</dt>
+              <dd className="mt-1 text-muted-foreground">
+                {methodology.limitations[0]}
+              </dd>
+            </div>
+          ) : null}
+          {methodology.sources.length > 0 ? (
+            <div>
+              <dt className="font-medium text-foreground">Sources reviewed</dt>
+              <dd className="mt-1">
+                <ul className="space-y-1 text-muted-foreground">
+                  {methodology.sources.map((source) => (
+                    <li key={source.id}>{source.label}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ) : null}
         </dl>
         <p className="mt-5 border-t border-border pt-4 text-sm text-muted-foreground">
           {methodology.disclaimer}

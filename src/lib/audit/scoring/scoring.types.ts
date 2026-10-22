@@ -1,11 +1,7 @@
 /**
- * Deterministic digital-presence scoring types (strict-v1.0).
- * Independent of OpenAI SDK calls, crawler I/O, and frontend.
+ * Deterministic digital-presence scoring types.
+ * Shared by OpenAI-web criterion anchors and maturity-band rules.
  */
-
-import type { CrawlResult } from "@/features/audit/types/evidence.types";
-import type { AIAnalysisResult } from "@/lib/audit/integrations/openai/analysis.types";
-import type { PerformanceResult } from "@/lib/audit/integrations/pagespeed/pagespeed.types";
 
 export const SCORING_VERSION_STRICT_V1 = "strict-v1.0" as const;
 
@@ -164,17 +160,6 @@ export type ScoringPolicyFlag =
   | "pagespeed_unavailable"
   | "category_methodology_review_required"
   | "digital_leader_corroboration_failed";
-
-export type ScoringInput = {
-  crawl: CrawlResult;
-  performance: PerformanceResult | null;
-  analysis: AIAnalysisResult | null;
-  /** Optional hint; engine also infers from evidence. */
-  businessModelHint?: BusinessModelHint;
-  /** Override config version lookup; defaults to strict-v1.0. */
-  scoringVersion?: ScoringVersionId;
-  assessedAt?: string;
-};
 
 export type ScoringResult = {
   ok: boolean;

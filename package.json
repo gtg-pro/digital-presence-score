@@ -11,13 +11,10 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
-    "audit:sample-evidence": "vitest run src/lib/audit/extraction/extract-page.test.ts -t \"extracts structured fields\"",
-    "audit:pagespeed-smoke": "node scripts/pagespeed-smoke.mjs",
-    "audit:openai-smoke": "node scripts/openai-analysis-smoke.mjs"
+    "audit:openai-smoke": "node scripts/openai-web-audit-smoke.mjs"
   },
   "dependencies": {
     "@sparticuz/chromium": "^153.0.0",
-    "cheerio": "^1.2.0",
     "clsx": "^2.1.1",
     "lucide-react": "^1.60.0",
     "next": "16.4.2",

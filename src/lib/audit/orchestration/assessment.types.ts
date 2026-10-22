@@ -1,11 +1,9 @@
 /**
- * Hybrid Audit assessment orchestration types.
+ * OpenAI-only digital presence assessment orchestration types.
  * Ephemeral AssessmentResult — no durable storage implied.
  */
 
-import type { CrawlResult } from "@/features/audit/types/evidence.types";
-import type { AIAnalysisResult } from "@/lib/audit/integrations/openai/analysis.types";
-import type { PerformanceResult } from "@/lib/audit/integrations/pagespeed/pagespeed.types";
+import type { OpenAIWebAuditCallResult } from "@/lib/audit/openai-audit/openai-audit.types";
 import type {
   AuditOutcomeStatus,
   BusinessModelHint,
@@ -31,7 +29,9 @@ export type IntegrationAvailabilityStatus =
   | "not_requested";
 
 export type IntegrationAvailability = {
+  /** Retained for report/session compatibility; always not_requested in OpenAI-only mode. */
   crawler: IntegrationAvailabilityStatus;
+  /** Retained for report/session compatibility; always not_requested in OpenAI-only mode. */
   pagespeed: IntegrationAvailabilityStatus;
   openai: IntegrationAvailabilityStatus;
   scoring: IntegrationAvailabilityStatus;
@@ -92,11 +92,8 @@ export type AssessmentRecommendation = {
 /** Pipeline stages reported via optional onProgress (genuine work markers). */
 export type AssessmentProgressStage =
   | "validating"
-  | "crawling"
-  | "collecting_evidence"
-  | "pagespeed"
-  | "content_analysis"
-  | "validating_findings"
+  | "retrieving"
+  | "analyzing"
   | "scoring"
   | "preparing_report";
 
@@ -115,14 +112,10 @@ export type AssessmentRequest = {
   scoringVersion?: ScoringVersionId;
   /** Overall wall-clock budget for the assessment (default 120s). */
   timeoutMs?: number;
-  /** Skip PageSpeed (still records unavailable). */
-  skipPagespeed?: boolean;
-  /** Skip OpenAI analysis (still records unavailable). */
-  skipOpenAI?: boolean;
   assessedAt?: string;
   /**
    * Allow empty website URL (minimal-info path).
-   * Produces LIMITED_VISIBILITY without crawling.
+   * Produces LIMITED_VISIBILITY without OpenAI retrieval.
    */
   allowMissingWebsite?: boolean;
   /** Optional abort for disconnected clients / cancellation. */
@@ -130,24 +123,18 @@ export type AssessmentRequest = {
   /** Optional genuine stage progress reporter. */
   onProgress?: (event: AssessmentProgressEvent) => void;
   /**
-   * Test-only injectables. Production uses live integrations.
-   * When provided, live network calls for that stage are skipped.
+   * Test-only injectable. Production uses live OpenAI web audit.
+   * When provided, the live OpenAI network call is skipped.
    */
-  crawlFn?: (url: string) => Promise<CrawlResult>;
-  pagespeedFn?: (crawl: CrawlResult) => Promise<PerformanceResult | null>;
-  analysisFn?: (crawl: CrawlResult) => Promise<AIAnalysisResult | null>;
-  /** Test-only scoring override. Production uses scoreDigitalPresence. */
-  scoringFn?: (input: {
-    crawl: CrawlResult;
-    performance: PerformanceResult | null;
-    analysis: AIAnalysisResult | null;
-  }) => ScoringResult;
+  openaiAuditFn?: (input: {
+    websiteUrl: string;
+    signal?: AbortSignal;
+  }) => Promise<OpenAIWebAuditCallResult>;
 };
 
 /**
- * Structured Hybrid Audit output.
- * Compatible in spirit with DigitalPresenceReport (nullable score/band, categories, coverage).
- * Not wired to the frontend yet.
+ * Structured OpenAI-only audit output.
+ * Compatible with DigitalPresenceReport mapping (nullable score/band, categories).
  */
 export type AssessmentResult = {
   assessmentId: string;
@@ -175,10 +162,16 @@ export type AssessmentResult = {
   limitationReasons: string[];
   warnings: AssessmentWarning[];
   errors: AssessmentError[];
-  /** Raw scoring snapshot for debugging / future report mapping. */
+  /** Raw scoring snapshot for validation / future mapping. */
   scoring: ScoringResult | null;
   rejectedAiFindingIds: string[];
   startedAt: string;
   finishedAt: string;
   ephemeral: true;
+  /** Customer-facing executive summary from validated OpenAI payload. */
+  executiveSummary: string | null;
+  /** Prioritized next steps (professional copy). */
+  nextSteps: string[];
+  /** Category narrative summaries keyed by scoring category id. */
+  categoryNarratives: Record<string, string>;
 };

@@ -42,6 +42,8 @@ function ScoreRing({ score, maxScore }: { score: number; maxScore: number }) {
 }
 
 export function OverallScore({ report }: { report: DigitalPresenceReport }) {
+  const summary = report.executiveSummary?.trim();
+
   if (report.outcome === "complete" && report.overallScore !== null) {
     return (
       <section
@@ -68,11 +70,11 @@ export function OverallScore({ report }: { report: DigitalPresenceReport }) {
                 {report.maturityBand}
               </p>
             ) : null}
-            <p className="mt-2 text-sm text-muted-foreground">
-              {report.isDemo
-                ? "Illustrative demo score only — not a verified assessment result. Maturity bands are shown for UI presentation and are not computed live in this frontend."
-                : "Score produced by the deterministic strict-v1.0 scoring engine from collected evidence. Unassessed checks are disclosed separately and are not treated as failures."}
-            </p>
+            {summary ? (
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {summary}
+              </p>
+            ) : null}
           </div>
         </div>
       </section>
@@ -86,48 +88,17 @@ export function OverallScore({ report }: { report: DigitalPresenceReport }) {
         className="rounded-xl border border-border bg-background p-6 shadow-sm sm:p-8"
       >
         <p className="text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
-          Overall result
+          Digital presence overview
         </p>
         <h2
           id="overall-score-heading"
           className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
         >
-          Partial Audit
+          Supported findings overview
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Some checks could not be completed. Unverified areas are shown as Not
-          Assessed rather than counted as failures. No overall /100 score or
-          maturity band is displayed for this outcome.
-        </p>
-        <p className="mt-3 text-sm font-medium text-foreground">
-          Evidence coverage: {report.evidenceCoveragePercent}%
-        </p>
-      </section>
-    );
-  }
-
-  if (report.outcome === "limited") {
-    return (
-      <section
-        aria-labelledby="overall-score-heading"
-        className="rounded-xl border border-border bg-background p-6 shadow-sm sm:p-8"
-      >
-        <p className="text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
-          Overall result
-        </p>
-        <h2
-          id="overall-score-heading"
-          className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
-        >
-          Limited Visibility Snapshot
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-          We couldn&apos;t confidently verify a business website. This snapshot
-          contains only the limited public information available. No numerical
-          score is displayed.
-        </p>
-        <p className="mt-3 text-sm font-medium text-foreground">
-          Evidence coverage: {report.evidenceCoveragePercent}%
+          {summary ??
+            "This overview shares the publicly supported observations available for this website. An overall score out of 100 is not shown when available information is incomplete."}
         </p>
       </section>
     );
@@ -139,20 +110,17 @@ export function OverallScore({ report }: { report: DigitalPresenceReport }) {
       className="rounded-xl border border-border bg-background p-6 shadow-sm sm:p-8"
     >
       <p className="text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
-        Overall result
+        Digital presence overview
       </p>
       <h2
         id="overall-score-heading"
         className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
       >
-        Score unavailable
+        Limited public information
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-        This complete-audit demo is missing an overall score. No fabricated
-        /100 value is shown.
-      </p>
-      <p className="mt-3 text-sm font-medium text-foreground">
-        Evidence coverage: {report.evidenceCoveragePercent}%
+        {summary ??
+          "A complete numerical digital presence score could not be published because public website information was insufficient for this run."}
       </p>
     </section>
   );
