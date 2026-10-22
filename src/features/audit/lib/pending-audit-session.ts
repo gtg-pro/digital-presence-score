@@ -23,6 +23,7 @@ export async function stashPendingAudit(
       ...body,
       createdAt: Date.now(),
       nonce: randomBytes(8).toString("hex"),
+      captchaVerified: true,
     };
     const jar = await cookies();
     jar.set(PENDING_AUDIT_COOKIE, sealPayload(JSON.stringify(payload)), {
@@ -48,6 +49,7 @@ export async function loadPendingAudit(): Promise<PendingAuditCookiePayload | nu
     if (
       !parsed ||
       typeof parsed.createdAt !== "number" ||
+      parsed.captchaVerified !== true ||
       Date.now() - parsed.createdAt > PENDING_AUDIT_TTL_SECONDS * 1000
     ) {
       return null;

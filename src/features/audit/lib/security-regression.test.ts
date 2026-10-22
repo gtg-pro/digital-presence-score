@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   sealAssessmentHandoff,
@@ -70,6 +70,23 @@ describe("SSRF / unsafe URL rejection at audit boundary", () => {
     });
     // Either structural failure or accepted normalized — must not throw.
     expect(result).toBeTruthy();
+  });
+});
+
+describe("recaptcha gate before OpenAI", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("maps missing captcha to the user-facing completion message", async () => {
+    vi.stubEnv("RECAPTCHA_SECRET_KEY", "test-secret");
+    vi.stubEnv("ALLOW_AUDIT_E2E_FIXTURES", "");
+    const { verifyRecaptchaV2 } = await import("@/lib/recaptcha/verify-recaptcha");
+    const result = await verifyRecaptchaV2({ token: null });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toBe("Please complete the CAPTCHA verification.");
+    }
   });
 });
 

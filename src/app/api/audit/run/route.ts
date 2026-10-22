@@ -15,6 +15,10 @@ import {
 import { runAuditStream } from "@/features/audit/lib/run-audit-stream";
 import { validateAuditRunRequest } from "@/features/audit/lib/validate-audit-run-request";
 import type { AuditStreamEvent } from "@/features/audit/types/audit-run.types";
+import {
+  canSkipRecaptchaForE2E,
+  verifyRecaptchaV2,
+} from "@/lib/recaptcha/verify-recaptcha";
 
 const NO_STORE = {
   "Cache-Control": "no-store, no-cache, must-revalidate, private",
@@ -115,6 +119,32 @@ export async function POST(request: Request): Promise<Response> {
       typeof bodyRecord.websiteUrl === "string" &&
       bodyRecord.websiteUrl.trim(),
   );
+
+  // Prefer captcha-verified pending session. Direct body submissions must
+  // include a fresh captcha token so OpenAI cannot be reached without verification.
+  if (bodyHasInputs && !canSkipRecaptchaForE2E()) {
+    const captchaToken =
+      typeof bodyRecord?.captchaToken === "string"
+        ? bodyRecord.captchaToken
+        : null;
+    const captcha = await verifyRecaptchaV2({
+      token: captchaToken,
+      remoteip: clientKey(request) === "unknown" ? null : clientKey(request),
+    });
+    if (!captcha.ok) {
+      return Response.json(
+        {
+          type: "error",
+          code: "captcha_failed",
+          message: captcha.message,
+          retryable: true,
+          at: new Date().toISOString(),
+        },
+        { status: 403, headers: { "Cache-Control": "no-store" } },
+      );
+    }
+  }
+
   const source = bodyHasInputs ? bodyJson : (pending ?? bodyJson);
   if (!source) {
     return Response.json(
@@ -126,6 +156,24 @@ export async function POST(request: Request): Promise<Response> {
         at: new Date().toISOString(),
       },
       { status: 400, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
+  if (
+    !bodyHasInputs &&
+    pending &&
+    pending.captchaVerified !== true &&
+    !canSkipRecaptchaForE2E()
+  ) {
+    return Response.json(
+      {
+        type: "error",
+        code: "captcha_failed",
+        message: "Security verification failed. Please try again.",
+        retryable: true,
+        at: new Date().toISOString(),
+      },
+      { status: 403, headers: { "Cache-Control": "no-store" } },
     );
   }
 

@@ -1,12 +1,22 @@
 "use client";
 
-import { useId, useState, useTransition, type FormEvent } from "react";
+import {
+  useId,
+  useRef,
+  useState,
+  useTransition,
+  type FormEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Link2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  RecaptchaV2,
+  type RecaptchaV2Handle,
+} from "@/components/recaptcha/RecaptchaV2";
 import { startAuditFromWebsiteUrl } from "@/features/audit/actions/start-audit";
 import {
   getWebsiteUrlValidationMessage,
@@ -33,10 +43,20 @@ export function WebsiteUrlInput({
   const router = useRouter();
   const inputId = useId();
   const errorId = useId();
+  const captchaRef = useRef<RecaptchaV2Handle>(null);
   const [value, setValue] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [submittedOnce, setSubmittedOnce] = useState(false);
+
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
+  const captchaRequired = startLiveAudit && Boolean(siteKey);
+
+  function resetCaptcha() {
+    captchaRef.current?.reset();
+    setCaptchaToken(null);
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,6 +65,18 @@ export function WebsiteUrlInput({
     const message = getWebsiteUrlValidationMessage(value);
     if (message) {
       setError(message);
+      return;
+    }
+
+    if (startLiveAudit && captchaRequired && !captchaToken) {
+      setError("Please complete the CAPTCHA verification.");
+      return;
+    }
+
+    if (startLiveAudit && !siteKey) {
+      setError(
+        "Security verification is temporarily unavailable. Please try again later.",
+      );
       return;
     }
 
@@ -60,10 +92,11 @@ export function WebsiteUrlInput({
 
     setSubmittedOnce(true);
     startTransition(async () => {
-      const result = await startAuditFromWebsiteUrl(normalized);
+      const result = await startAuditFromWebsiteUrl(normalized, captchaToken);
       if (result && !result.ok) {
         setSubmittedOnce(false);
         setError(result.message);
+        resetCaptcha();
       }
     });
   }
@@ -79,8 +112,8 @@ export function WebsiteUrlInput({
         Website URL
       </Label>
 
-      <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
-        <div className="relative min-w-0 flex-1">
+      <div className="flex w-full flex-col gap-3">
+        <div className="relative min-w-0 w-full">
           <Link2
             aria-hidden="true"
             className="pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-muted-foreground"
@@ -103,6 +136,27 @@ export function WebsiteUrlInput({
             className="h-14 pl-11 text-base sm:text-[1.05rem]"
           />
         </div>
+
+        {captchaRequired ? (
+          <div className="flex justify-center sm:justify-start">
+            <RecaptchaV2
+              ref={captchaRef}
+              siteKey={siteKey}
+              onChange={(token) => {
+                setCaptchaToken(token);
+                if (token && error) setError(null);
+              }}
+              onExpired={() => {
+                setCaptchaToken(null);
+                setError("Verification expired. Please verify again.");
+              }}
+              onError={() => {
+                setCaptchaToken(null);
+                setError("Security verification failed. Please try again.");
+              }}
+            />
+          </div>
+        ) : null}
 
         <Button
           type="submit"
