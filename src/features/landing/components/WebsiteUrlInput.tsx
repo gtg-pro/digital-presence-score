@@ -33,12 +33,18 @@ export type WebsiteUrlInputProps = {
   startLiveAudit?: boolean;
   /** Destination path when startLiveAudit is false. Defaults to /audit. */
   auditPath?: string;
+  /**
+   * reCAPTCHA v2 site key from the server (`RECAPTCHA_SITE_KEY`).
+   * Must be passed from a Server Component — it is not available as NEXT_PUBLIC_*.
+   */
+  recaptchaSiteKey?: string | null;
 };
 
 export function WebsiteUrlInput({
   className,
   startLiveAudit = true,
   auditPath = "/audit",
+  recaptchaSiteKey = null,
 }: WebsiteUrlInputProps) {
   const router = useRouter();
   const inputId = useId();
@@ -50,7 +56,7 @@ export function WebsiteUrlInput({
   const [isPending, startTransition] = useTransition();
   const [submittedOnce, setSubmittedOnce] = useState(false);
 
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
+  const siteKey = recaptchaSiteKey?.trim() ?? "";
   const captchaRequired = startLiveAudit && Boolean(siteKey);
 
   function resetCaptcha() {

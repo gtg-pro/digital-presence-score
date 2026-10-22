@@ -1,8 +1,11 @@
 import { Container } from "@/components/ui/container";
+import { getRecaptchaSiteKey } from "@/lib/recaptcha/verify-recaptcha";
 
 import { WebsiteUrlInput } from "./WebsiteUrlInput";
 
 export function HeroSection() {
+  const recaptchaSiteKey = getRecaptchaSiteKey();
+
   return (
     <section
       id="home"
@@ -24,7 +27,7 @@ export function HeroSection() {
         </p>
 
         <div className="mt-6 w-full max-w-2xl sm:mt-8">
-          <WebsiteUrlInput />
+          <WebsiteUrlInput recaptchaSiteKey={recaptchaSiteKey} />
 
           <p className="mt-3 text-sm text-muted-foreground">
             A public digital-presence assessment. No login required.

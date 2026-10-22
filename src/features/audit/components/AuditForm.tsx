@@ -32,9 +32,14 @@ import { PublicProfileFields } from "./PublicProfileFields";
 
 export type AuditFormProps = {
   initialWebsiteUrl?: string;
+  /** Server-provided reCAPTCHA v2 site key (`RECAPTCHA_SITE_KEY`). */
+  recaptchaSiteKey?: string | null;
 };
 
-export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
+export function AuditForm({
+  initialWebsiteUrl = "",
+  recaptchaSiteKey = null,
+}: AuditFormProps) {
   const [values, setValues] = useState<AuditFormValues>(() =>
     initialAuditFormValues(initialWebsiteUrl),
   );
@@ -46,7 +51,7 @@ export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
   const [submittedOnce, setSubmittedOnce] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<RecaptchaV2Handle>(null);
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
+  const siteKey = recaptchaSiteKey?.trim() ?? "";
 
   const fieldProps = useMemo(
     () => ({

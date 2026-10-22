@@ -146,7 +146,7 @@ export async function verifyRecaptchaV2(input: {
 }
 
 export function getRecaptchaSiteKey(): string | null {
-  const key = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim();
+  const key = process.env.RECAPTCHA_SITE_KEY?.trim();
   return key || null;
 }
 
