@@ -135,7 +135,7 @@ describe("Prompt 22 — accurate public claims", () => {
     const blob = faqs.map((f) => `${f.question} ${f.answer}`).join("\n").toLowerCase();
     expect(blob).toContain("email delivery is not available");
     expect(blob).toContain("public sharing is not available");
-    expect(blob).toMatch(/30 minutes|temporary|session/);
+    expect(blob).toMatch(/24 hours|temporary|session/);
     expect(blob).not.toMatch(/admin review/);
     expect(blob).not.toMatch(/automatically emailed/);
     expect(blob).not.toMatch(/permanently stored on our servers/);
@@ -143,7 +143,7 @@ describe("Prompt 22 — accurate public claims", () => {
 
   it("site disclaimer communicates session and delivery limits", () => {
     const text = siteConfig.disclaimer.toLowerCase();
-    expect(text).toContain("30 minutes");
+    expect(text).toContain("24 hours");
     expect(text).toContain("email delivery");
     expect(text).toContain("not available");
   });

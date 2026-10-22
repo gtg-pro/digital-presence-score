@@ -41,7 +41,7 @@ export function ReportResultView({
         {report.outcome !== "limited" ? (
           <ActionPlanSection report={report} />
         ) : null}
-        <ReportActions reportId={report.id} isDemo={report.isDemo} />
+        <ReportActions report={report} />
         <StrategyCallCTA />
       </div>
     </Container>

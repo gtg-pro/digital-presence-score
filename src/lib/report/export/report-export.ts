@@ -15,6 +15,11 @@ import {
   isValidReportExportId,
   validateReportForExport,
 } from "@/lib/report/export/export-validation";
+import {
+  buildPdfFooterTemplate,
+  buildPdfHeaderTemplate,
+} from "@/lib/report/export/pdf-chrome";
+import { PDF_MARGIN } from "@/lib/report/export/pdf-theme";
 import { renderReportExportHtml } from "@/lib/report/export/report-renderer";
 import type {
   ReportExportError,
@@ -105,7 +110,10 @@ export async function exportReport(
   if (invalid) return invalid;
 
   const html =
-    options.htmlOverride ?? renderReportExportHtml(options.report);
+    options.htmlOverride ??
+    renderReportExportHtml(options.report, {
+      variant: options.format === "pdf" ? "pdf" : "png",
+    });
   const filename = buildExportFilename(options.report, options.format);
 
   try {
@@ -142,12 +150,17 @@ export async function exportReport(
             await page.pdf({
               format: "A4",
               printBackground: true,
+              // Honor CSS @page :first { margin-top: 0 } vs continuation top margin.
               preferCSSPageSize: true,
+              displayHeaderFooter: true,
+              // Header is rendered once in the PDF body (page 1 only).
+              headerTemplate: buildPdfHeaderTemplate(),
+              footerTemplate: buildPdfFooterTemplate(),
               margin: {
-                top: "14mm",
-                right: "12mm",
-                bottom: "14mm",
-                left: "12mm",
+                top: PDF_MARGIN.top,
+                right: PDF_MARGIN.right,
+                bottom: PDF_MARGIN.bottom,
+                left: PDF_MARGIN.left,
               },
             }),
           );

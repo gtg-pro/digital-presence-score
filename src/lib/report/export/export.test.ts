@@ -8,6 +8,7 @@ import {
   partialOpenAIAuditPayload,
 } from "@/lib/audit/openai-audit/fixtures";
 import { runAssessment } from "@/lib/audit/orchestration/assessment";
+import { formatGeneratedLabel } from "@/lib/report/export/pdf-chrome";
 import { renderReportExportHtml } from "@/lib/report/export/report-renderer";
 
 describe("report export HTML", () => {
@@ -29,6 +30,32 @@ describe("report export HTML", () => {
     expect(html).not.toMatch(/Evidence coverage:/i);
     expect(html).not.toMatch(/NOT_ASSESSED/);
     expect(html).not.toMatch(/PageSpeed/i);
+  });
+
+  it("PDF variant inlines a first-page header with Poppins chrome copy", async () => {
+    const assessment = await runAssessment({
+      websiteUrl: "https://example-plumbing.example/",
+      assessedAt: "2026-10-21T06:00:00.000Z",
+      openaiAuditFn: async () =>
+        mockOpenAIAuditSuccess(completeOpenAIAuditPayload()),
+    });
+    const report = mapAssessmentToReport(assessment);
+    const html = renderReportExportHtml(report, { variant: "pdf" });
+
+    expect(html).not.toContain("WEBSITE AUDIT TOOL");
+    expect(html).not.toContain("WEBSITE AUDIT &amp; INSIGHTS");
+    expect(html).toContain("WEBSITE AUDIT REPORT");
+    expect(html).toContain("font-family: \"Poppins\"");
+    expect(html).toContain("pdf-doc-header");
+  });
+
+  it("strips time from the generated date label", () => {
+    expect(formatGeneratedLabel("Oct 22, 2026, 8:28 AM UTC")).toBe(
+      "GENERATED  OCT 22, 2026",
+    );
+    expect(formatGeneratedLabel("Illustrative date — demo only")).toBe(
+      "GENERATED  ILLUSTRATIVE DATE — DEMO ONLY",
+    );
   });
 
   it("renders overview copy for PARTIAL reports", async () => {

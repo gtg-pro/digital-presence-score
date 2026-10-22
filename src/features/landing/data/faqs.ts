@@ -48,7 +48,7 @@ export const faqs: FAQItem[] = [
     id: "report-visibility",
     question: "Is my report publicly visible?",
     answer:
-      "No. Reports are private to your browser session. Public sharing is not available. Live reports are held temporarily in encrypted session cookies (about 30 minutes) and are not stored permanently on our servers.",
+      "No. Reports are private to your browser session. Public sharing is not available. Live reports are held temporarily in encrypted session cookies (about 24 hours) and are not stored permanently on our servers.",
   },
   {
     id: "no-website",
@@ -60,6 +60,6 @@ export const faqs: FAQItem[] = [
     id: "session-limits",
     question: "How long is my live report available?",
     answer:
-      "Live reports are short-lived session snapshots (approximately 30 minutes) with a limited encrypted cookie payload size. If the session expires or the result is too large to store, re-run the assessment to generate a new report.",
+      "Live reports are short-lived session snapshots (approximately 24 hours) with a limited encrypted cookie payload size. If the session expires or the result is too large to store, re-run the assessment to generate a new report.",
   },
 ];

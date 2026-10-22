@@ -16,7 +16,7 @@ import { cookieSecureAttribute } from "@/lib/cookie-secure";
  * - Per-cookie chunk size (~3KB) and max chunks (see MAX_CHUNKS).
  * - JSON is deflate-compressed before encryption to stay under typical
  *   Node.js Cookie header limits (default `--max-http-header-size` is 16KB).
- * - Survives only for the browser session TTL (default 30 minutes).
+ * - Survives only for the browser session TTL (default 24 hours).
  * - Not durable across deployments/restarts/devices — not a database.
  * - Does not store raw AssessmentResult, API keys, or provider payloads.
  *
@@ -26,7 +26,8 @@ import { cookieSecureAttribute } from "@/lib/cookie-secure";
 
 export const EPHEMERAL_REPORT_COOKIE_PREFIX = "dps_live_report";
 export const EPHEMERAL_REPORT_META_COOKIE = "dps_live_report_meta";
-export const EPHEMERAL_REPORT_TTL_SECONDS = 30 * 60;
+/** Keep live report cookies available for a full working day. */
+export const EPHEMERAL_REPORT_TTL_SECONDS = 24 * 60 * 60;
 /** Usable characters per cookie value (browser ~4KB limit with name/attrs). */
 export const MAX_CHUNK_BYTES = 3000;
 /**

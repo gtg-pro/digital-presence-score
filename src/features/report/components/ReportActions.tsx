@@ -4,22 +4,23 @@ import { useState } from "react";
 import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import type { DigitalPresenceReport } from "@/features/report/types/report.types";
 
 export type ReportActionsProps = {
-  reportId: string;
-  isDemo?: boolean;
+  report: DigitalPresenceReport;
 };
 
 /**
  * Report downloads hit trusted server export routes.
+ * Live exports POST the in-page report payload so download does not depend on
+ * the short-lived cookie still being present.
  * Email and public sharing are intentionally not offered until implemented.
  */
-export function ReportActions({
-  reportId,
-  isDemo = false,
-}: ReportActionsProps) {
+export function ReportActions({ report }: ReportActionsProps) {
   const [busy, setBusy] = useState<"pdf" | "png" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const reportId = report.id;
+  const isDemo = report.isDemo;
 
   async function download(format: "pdf" | "png") {
     setError(null);
@@ -28,9 +29,14 @@ export function ReportActions({
       const response = await fetch(
         `/api/report/${encodeURIComponent(reportId)}/${format}`,
         {
-          method: "GET",
+          method: "POST",
           credentials: "same-origin",
           cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: format === "pdf" ? "application/pdf" : "image/png",
+          },
+          body: JSON.stringify({ report }),
         },
       );
 
@@ -83,7 +89,7 @@ export function ReportActions({
         <p className="mt-2 text-sm text-muted-foreground">
           {isDemo
             ? "Download illustrative PDF or PNG exports of this sample report. Email delivery and public sharing are not available."
-            : "Download a PDF or PNG of this report. Live reports are private browser-session snapshots (about 30 minutes) and are not emailed or shared publicly."}
+            : "Download a PDF or PNG of this report. Email delivery and public sharing are not available."}
         </p>
       </div>
 

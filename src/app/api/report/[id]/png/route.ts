@@ -1,4 +1,7 @@
-import { exportReportById } from "@/lib/report/export/report-export";
+import {
+  handleExportGet,
+  handleExportPost,
+} from "@/lib/report/export/export-route";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -6,27 +9,10 @@ type RouteContext = {
 
 export async function GET(_request: Request, context: RouteContext) {
   const { id } = await context.params;
-  const result = await exportReportById(id, "png");
+  return handleExportGet(id, "png");
+}
 
-  if (!result.ok) {
-    return Response.json(
-      { error: result.code, message: result.message },
-      {
-        status: result.httpStatus,
-        headers: {
-          "Cache-Control": "private, no-store",
-        },
-      },
-    );
-  }
-
-  return new Response(new Uint8Array(result.bytes), {
-    status: 200,
-    headers: {
-      "Content-Type": result.contentType,
-      "Content-Disposition": `attachment; filename="${result.filename}"`,
-      "Cache-Control": "private, no-store",
-      "X-Report-Demo": result.isDemo ? "1" : "0",
-    },
-  });
+export async function POST(request: Request, context: RouteContext) {
+  const { id } = await context.params;
+  return handleExportPost(request, id, "png");
 }
