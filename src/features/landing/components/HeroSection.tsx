@@ -1,6 +1,5 @@
 import { ConicBorderPill } from "@/components/shared/conic-border-pill";
 import { Container } from "@/components/ui/container";
-import { getRecaptchaSiteKey } from "@/lib/recaptcha/verify-recaptcha";
 
 import { WebsiteUrlInput } from "./WebsiteUrlInput";
 
@@ -11,7 +10,7 @@ export type HeroSectionProps = {
   badgeText?: string;
   heading?: string;
   description?: string;
-  /** When false, hides the website URL + CAPTCHA form. */
+  /** When false, hides the website URL form. */
   showUrlInput?: boolean;
   /** When false, hides the “No login required” note. */
   showFooterNote?: boolean;
@@ -31,8 +30,6 @@ export function HeroSection({
   sectionId = "home",
   headingId = "hero-heading",
 }: HeroSectionProps = {}) {
-  const recaptchaSiteKey = showUrlInput ? getRecaptchaSiteKey() : null;
-
   return (
     <section
       id={sectionId}
@@ -71,10 +68,7 @@ export function HeroSection({
 
           {showUrlInput ? (
             <div className="w-full max-w-[845px]">
-              <WebsiteUrlInput
-                variant="hero"
-                recaptchaSiteKey={recaptchaSiteKey}
-              />
+              <WebsiteUrlInput variant="hero" />
             </div>
           ) : null}
 

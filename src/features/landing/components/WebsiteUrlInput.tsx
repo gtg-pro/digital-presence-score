@@ -2,7 +2,6 @@
 
 import {
   useId,
-  useRef,
   useState,
   useTransition,
   type FormEvent,
@@ -13,10 +12,6 @@ import { Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  RecaptchaV2,
-  type RecaptchaV2Handle,
-} from "@/components/recaptcha/RecaptchaV2";
 import { startAuditFromWebsiteUrl } from "@/features/audit/actions/start-audit";
 import {
   getWebsiteUrlValidationMessage,
@@ -36,11 +31,6 @@ export type WebsiteUrlInputProps = {
   startLiveAudit?: boolean;
   /** Destination path when startLiveAudit is false. Defaults to /audit. */
   auditPath?: string;
-  /**
-   * reCAPTCHA v2 site key from the server (`RECAPTCHA_SITE_KEY`).
-   * Must be passed from a Server Component — it is not available as NEXT_PUBLIC_*.
-   */
-  recaptchaSiteKey?: string | null;
   /** Visual style. `hero` matches the Figma landing hero. */
   variant?: "default" | "hero";
 };
@@ -49,27 +39,17 @@ export function WebsiteUrlInput({
   className,
   startLiveAudit = true,
   auditPath = "/audit",
-  recaptchaSiteKey = null,
   variant = "default",
 }: WebsiteUrlInputProps) {
   const router = useRouter();
   const inputId = useId();
   const errorId = useId();
-  const captchaRef = useRef<RecaptchaV2Handle>(null);
   const [value, setValue] = useState("");
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [submittedOnce, setSubmittedOnce] = useState(false);
 
-  const siteKey = recaptchaSiteKey?.trim() ?? "";
-  const captchaRequired = startLiveAudit && Boolean(siteKey);
   const isHero = variant === "hero";
-
-  function resetCaptcha() {
-    captchaRef.current?.reset();
-    setCaptchaToken(null);
-  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,18 +58,6 @@ export function WebsiteUrlInput({
     const message = getWebsiteUrlValidationMessage(value);
     if (message) {
       setError(message);
-      return;
-    }
-
-    if (startLiveAudit && captchaRequired && !captchaToken) {
-      setError("Please complete the CAPTCHA verification.");
-      return;
-    }
-
-    if (startLiveAudit && !siteKey) {
-      setError(
-        "Security verification is temporarily unavailable. Please try again later.",
-      );
       return;
     }
 
@@ -105,11 +73,10 @@ export function WebsiteUrlInput({
 
     setSubmittedOnce(true);
     startTransition(async () => {
-      const result = await startAuditFromWebsiteUrl(normalized, captchaToken);
+      const result = await startAuditFromWebsiteUrl(normalized);
       if (result && !result.ok) {
         setSubmittedOnce(false);
         setError(result.message);
-        resetCaptcha();
       }
     });
   }
@@ -172,27 +139,6 @@ export function WebsiteUrlInput({
             />
           </div>
 
-          {!isHero && captchaRequired ? (
-            <div className="flex justify-center sm:justify-start">
-              <RecaptchaV2
-                ref={captchaRef}
-                siteKey={siteKey}
-                onChange={(token) => {
-                  setCaptchaToken(token);
-                  if (token && error) setError(null);
-                }}
-                onExpired={() => {
-                  setCaptchaToken(null);
-                  setError("Verification expired. Please verify again.");
-                }}
-                onError={() => {
-                  setCaptchaToken(null);
-                  setError("Security verification failed. Please try again.");
-                }}
-              />
-            </div>
-          ) : null}
-
           <Button
             type="submit"
             variant="primary"
@@ -225,27 +171,6 @@ export function WebsiteUrlInput({
             ) : null}
           </Button>
         </div>
-
-        {isHero && captchaRequired ? (
-          <div className="flex justify-center">
-            <RecaptchaV2
-              ref={captchaRef}
-              siteKey={siteKey}
-              onChange={(token) => {
-                setCaptchaToken(token);
-                if (token && error) setError(null);
-              }}
-              onExpired={() => {
-                setCaptchaToken(null);
-                setError("Verification expired. Please verify again.");
-              }}
-              onError={() => {
-                setCaptchaToken(null);
-                setError("Security verification failed. Please try again.");
-              }}
-            />
-          </div>
-        ) : null}
       </div>
 
       {error ? (

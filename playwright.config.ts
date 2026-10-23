@@ -38,9 +38,6 @@ export default defineConfig({
       PORT: String(PORT),
       ALLOW_AUDIT_E2E_FIXTURES: "1",
       AUDIT_E2E_FIXTURE: process.env.AUDIT_E2E_FIXTURE ?? "complete",
-      // Controlled fixture runs skip CAPTCHA; never set these empty on Vercel prod.
-      RECAPTCHA_SITE_KEY: "",
-      RECAPTCHA_SECRET_KEY: "",
       // Plain HTTP webServer — Secure cookies would not round-trip reliably.
       COOKIE_SECURE: "0",
       // Cookie report sessions can exceed Node's default 16KB header budget.

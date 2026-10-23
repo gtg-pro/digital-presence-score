@@ -2,7 +2,6 @@
 
 import {
   useMemo,
-  useRef,
   useState,
   useTransition,
   type FormEvent,
@@ -11,10 +10,6 @@ import { Link2, NotebookPen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  RecaptchaV2,
-  type RecaptchaV2Handle,
-} from "@/components/recaptcha/RecaptchaV2";
 import { startAuditFromForm } from "@/features/audit/actions/start-audit";
 import { validateAuditForm } from "@/features/audit/lib/validate-audit-form";
 import {
@@ -32,14 +27,9 @@ import { PublicProfileFields } from "./PublicProfileFields";
 
 export type AuditFormProps = {
   initialWebsiteUrl?: string;
-  /** Server-provided reCAPTCHA v2 site key (`RECAPTCHA_SITE_KEY`). */
-  recaptchaSiteKey?: string | null;
 };
 
-export function AuditForm({
-  initialWebsiteUrl = "",
-  recaptchaSiteKey = null,
-}: AuditFormProps) {
+export function AuditForm({ initialWebsiteUrl = "" }: AuditFormProps) {
   const [values, setValues] = useState<AuditFormValues>(() =>
     initialAuditFormValues(initialWebsiteUrl),
   );
@@ -49,9 +39,6 @@ export function AuditForm({
   );
   const [isPending, startTransition] = useTransition();
   const [submittedOnce, setSubmittedOnce] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<RecaptchaV2Handle>(null);
-  const siteKey = recaptchaSiteKey?.trim() ?? "";
 
   const fieldProps = useMemo(
     () => ({
@@ -87,11 +74,6 @@ export function AuditForm({
     }
   }
 
-  function resetCaptcha() {
-    captchaRef.current?.reset();
-    setCaptchaToken(null);
-  }
-
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isPending || submittedOnce) return;
@@ -106,20 +88,11 @@ export function AuditForm({
       return;
     }
 
-    if (siteKey && !captchaToken) {
-      setErrors((current) => ({
-        ...current,
-        form: "Please complete the CAPTCHA verification.",
-      }));
-      return;
-    }
-
     setSubmittedOnce(true);
     startTransition(async () => {
-      const result = await startAuditFromForm(values, captchaToken);
+      const result = await startAuditFromForm(values);
       if (result && !result.ok) {
         setSubmittedOnce(false);
-        resetCaptcha();
         setErrors((current) => ({
           ...current,
           ...(result.fieldErrors ?? {}),
@@ -170,37 +143,6 @@ export function AuditForm({
       </Card>
 
       <div className="space-y-4">
-        {siteKey ? (
-          <RecaptchaV2
-            ref={captchaRef}
-            siteKey={siteKey}
-            onChange={(token) => {
-              setCaptchaToken(token);
-              if (token) {
-                setErrors((current) => {
-                  if (!current.form) return current;
-                  const next = { ...current };
-                  delete next.form;
-                  return next;
-                });
-              }
-            }}
-            onExpired={() => {
-              setCaptchaToken(null);
-              setErrors((current) => ({
-                ...current,
-                form: "Verification expired. Please verify again.",
-              }));
-            }}
-            onError={() => {
-              setCaptchaToken(null);
-              setErrors((current) => ({
-                ...current,
-                form: "Security verification failed. Please try again.",
-              }));
-            }}
-          />
-        ) : null}
         <Button
           type="submit"
           className="h-12 w-full sm:w-auto sm:min-w-[14rem]"
