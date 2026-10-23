@@ -1,46 +1,58 @@
-import { CheckCircle2 } from "lucide-react";
-
 import type { DigitalPresenceReport } from "@/features/report/types/report.types";
+
+import { ReportBenefitBullet } from "./ReportBenefitBullet";
+
+const STRENGTH_ICON_URL =
+  "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1792757133/Icon_1_ywcyec.svg";
 
 export function StrengthsSection({ report }: { report: DigitalPresenceReport }) {
   if (report.strengths.length === 0) return null;
 
+  const midpoint = Math.ceil(report.strengths.length / 2);
+  const leftColumn = report.strengths.slice(0, midpoint);
+  const rightColumn = report.strengths.slice(midpoint);
+
   return (
-    <section aria-labelledby="strengths-heading" className="space-y-5">
-      <div>
+    <section
+      aria-labelledby="strengths-heading"
+      className="w-full space-y-8 md:space-y-12"
+    >
+      <div className="flex w-full flex-col items-center gap-2 text-center md:gap-3">
         <h2
           id="strengths-heading"
-          className="text-2xl font-semibold tracking-tight text-foreground"
+          className="font-title text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-[2.25rem] lg:leading-[44px]"
         >
-          Key strengths
+          Key <span className="text-[#2563EB]">Strengths</span>
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="font-heading text-sm text-[#9EA5B3] sm:text-base">
           {report.isDemo
             ? "Illustrative, evidence-supported strengths for this sample report."
             : "Evidence-supported strengths from this assessment."}
         </p>
       </div>
-      <ul className="space-y-4">
-        {report.strengths.map((item) => (
-          <li
-            key={item.id}
-            className="flex gap-3 rounded-xl border border-border bg-background p-5 shadow-sm"
-          >
-            <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-foreground" aria-hidden="true" />
-            <div>
-              <h3 className="text-base font-semibold text-foreground">{item.title}</h3>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                {item.explanation}
-              </p>
-              {item.evidenceLabel ? (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Evidence: {item.evidenceLabel}
-                </p>
-              ) : null}
-            </div>
-          </li>
-        ))}
-      </ul>
+
+      <div className="grid w-full grid-cols-1 gap-3 md:grid-cols-2 md:gap-x-10 md:gap-y-6 lg:gap-x-16">
+        <div className="flex flex-col gap-3 md:gap-6">
+          {leftColumn.map((item) => (
+            <ReportBenefitBullet
+              key={item.id}
+              icon={STRENGTH_ICON_URL}
+              label={item.title}
+              description={item.explanation}
+            />
+          ))}
+        </div>
+        <div className="flex flex-col gap-3 md:gap-6">
+          {rightColumn.map((item) => (
+            <ReportBenefitBullet
+              key={item.id}
+              icon={STRENGTH_ICON_URL}
+              label={item.title}
+              description={item.explanation}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

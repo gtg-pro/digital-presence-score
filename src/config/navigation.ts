@@ -35,22 +35,113 @@ export const footerQuickLinks: NavItem[] = [
 
 export const footerResourceLinks: NavItem[] = [
   { label: "FAQs", href: "/#faqs", isSection: true },
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms of Service", href: "/terms" },
   { label: "Assessment Methodology", href: "/methodology" },
 ];
 
 export const footerLegalLinks: NavItem[] = [
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms of Service", href: "/terms" },
+  {
+    label: "Terms of Services",
+    href: "https://baqidigital.com/terms-of-service/",
+  },
+  {
+    label: "Policies",
+    href: "https://baqidigital.com/privacy-policy/",
+  },
 ];
 
-export const footerCta = {
+/** Mid-page Ready to Build CTA band (landing). */
+export const readyToBuildCta = {
   heading: "Ready to see how your business performs online?",
-  description:
-    "Get a clear digital-presence assessment with practical findings and recommendations based on available public evidence for your business.",
-  label: "Get My Free Report Card",
-  href: "/#home",
-  secondaryLabel: "See How It Works",
-  secondaryHref: "/#how-it-works",
+  primaryLabel: "Get My Free Report Card",
+  primaryHref: "/#home",
+  secondaryLabel: "Call Now",
 } as const;
+
+/** Baqi Digital footer columns (Figma footer). */
+export const footerBrand = {
+  logoSrc:
+    "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1770303568/Logo_1_gr6aag.svg",
+  logoAlt: "Baqi Digital",
+  logoHref: "https://baqidigital.com/",
+  tagline:
+    "Modern marketing systems engineered for growth. Serving North American service businesses.",
+  copyrightName: "Baqi Digital",
+  decorativeSrc:
+    "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1792734979/27472512_1332_2_isrbig.svg",
+  contactEmailHref: "mailto:info@baqidigital.com",
+  contactPhoneHref: "tel:+16479437069",
+} as const;
+
+export const footerLinkColumns: { title: string; links: NavItem[] }[] = [
+  {
+    title: "Services",
+    links: [
+      {
+        label: "Paid Ads Systems",
+        href: "https://baqidigital.com/services/paid-ads-systems/",
+      },
+      {
+        label: "SEO Systems",
+        href: "https://baqidigital.com/services/seo-systems/",
+      },
+      {
+        label: "Funnels & Landing Pages",
+        href: "https://baqidigital.com/services/funnels-and-landing-pages/",
+      },
+      {
+        label: "CRM Systems & Automations",
+        href: "https://baqidigital.com/services/crm-systems-automations/",
+      },
+      {
+        label: "Analytics & Attribution",
+        href: "https://baqidigital.com/services/analytics-attribution/",
+      },
+      {
+        label: "Advisory Services",
+        href: "https://baqidigital.com/services/advisory-services/",
+      },
+    ],
+  },
+  {
+    title: "Industries",
+    links: [
+      {
+        label: "Legal",
+        href: "https://baqidigital.com/industries/legal/",
+      },
+      {
+        label: "Real Estate",
+        href: "https://baqidigital.com/industries/real-estate/",
+      },
+      {
+        label: "Beauty & Esthetics",
+        href: "https://baqidigital.com/industries/beauty-esthetics/",
+      },
+      {
+        label: "Medical & Wellness",
+        href: "https://baqidigital.com/industries/medical-wellness/",
+      },
+      {
+        label: "Home Services & Trades",
+        href: "https://baqidigital.com/industries/home-services-trades/",
+      },
+      {
+        label: "Automotive",
+        href: "https://baqidigital.com/industries/automotive/",
+      },
+      {
+        label: "E-Commerce",
+        href: "https://baqidigital.com/industries/e-commerce/",
+      },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", href: "https://baqidigital.com/about/" },
+      { label: "Services", href: "https://baqidigital.com/services/" },
+      { label: "Industries", href: "https://baqidigital.com/industries/" },
+      { label: "Contact", href: "https://baqidigital.com/contact-us/" },
+    ],
+  },
+];

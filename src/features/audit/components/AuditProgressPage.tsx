@@ -95,50 +95,56 @@ export function AuditProgressPage({
   );
 
   return (
-    <Container className="py-12 sm:py-16 lg:py-20">
-      <div
-        className="mx-auto max-w-3xl"
-        data-audit-progress-root="true"
-        data-audit-pending-session={hasPendingSession ? "yes" : "no"}
-        data-audit-fetch-initiated={
-          diagnostics.fetchInitiated ? "yes" : "no"
-        }
-      >
-        <h1 className="font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem]">
-          Analyzing your digital presence.
-        </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Our assessment process reviews available public digital signals to
-          identify strengths, weaknesses, and improvement opportunities.
-        </p>
+    <section className="bg-black py-12 sm:py-16 lg:py-20">
+      <Container>
+        <div
+          className="mx-auto max-w-3xl"
+          data-audit-progress-root="true"
+          data-audit-pending-session={hasPendingSession ? "yes" : "no"}
+          data-audit-fetch-initiated={
+            diagnostics.fetchInitiated ? "yes" : "no"
+          }
+        >
+          <h1 className="text-center font-title text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
+            Analyzing Your{" "}
+            <span className="text-[#2563EB]">Digital Presence.</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-center font-heading text-base leading-relaxed text-[#9EA5B3] sm:text-lg">
+            Our assessment process reviews available public digital signals to
+            identify strengths, weaknesses, and improvement opportunities.
+          </p>
 
-        <div className="mt-8 space-y-6">
-          {demoMode ? (
-            <AuditDemoStateSelector value={demoState} onChange={setDemoState} />
-          ) : null}
-          <AuditProgressStatusCard snapshot={snapshot} />
-        </div>
-
-        {!demoMode && snapshot.outcome === "failed" ? (
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            {snapshot.retryable !== false && hasPendingSession ? (
-              <Button
-                type="button"
-                onClick={() => retry()}
-                disabled={submitting}
-              >
-                Retry Audit
-              </Button>
+          <div className="mt-8 space-y-6">
+            {demoMode ? (
+              <AuditDemoStateSelector
+                value={demoState}
+                onChange={setDemoState}
+              />
             ) : null}
-            <Link
-              href="/#home"
-              className="inline-flex items-center justify-center rounded-lg border border-foreground bg-background px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              Back to audit form
-            </Link>
+            <AuditProgressStatusCard snapshot={snapshot} />
           </div>
-        ) : null}
-      </div>
-    </Container>
+
+          {!demoMode && snapshot.outcome === "failed" ? (
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              {snapshot.retryable !== false && hasPendingSession ? (
+                <Button
+                  type="button"
+                  onClick={() => retry()}
+                  disabled={submitting}
+                >
+                  Retry Audit
+                </Button>
+              ) : null}
+              <Link
+                href="/#home"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/30 bg-transparent px-5 py-3 font-title text-sm font-medium text-white transition-colors hover:bg-white/5"
+              >
+                Back to audit form
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      </Container>
+    </section>
   );
 }

@@ -1,4 +1,5 @@
-import { Container } from "@/components/ui/container";
+import { Info } from "lucide-react";
+
 import { sampleReport } from "@/features/report/data/sample-report";
 
 import { SampleReportCard } from "./SampleReportCard";
@@ -8,67 +9,49 @@ export function SampleReportSection() {
     <section
       id="sample-report"
       aria-labelledby="sample-report-heading"
-      className="border-b border-border bg-background"
+      className="relative isolate scroll-mt-28 py-12"
     >
-      <Container className="py-16 sm:py-20 lg:py-24">
-        <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="max-w-xl lg:pt-4">
-            <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase sm:text-sm">
-              Your Results, Simplified
+      <div className="relative z-10">
+        <div className="mx-auto max-w-[874px] text-center">
+          <h2
+            id="sample-report-heading"
+            className="font-title text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[3.25rem] lg:leading-[1.15]"
+          >
+            Know where you stand. See what{" "}
+            <span className="bg-gradient-to-r from-[#5182EF] to-[#2563EB] bg-clip-text text-transparent">
+              to improve.
+            </span>
+          </h2>
+
+          <p className="mx-auto mt-5 max-w-[694px] font-heading text-base leading-relaxed font-medium text-[#9EA5B3] sm:text-lg">
+            Get a clear picture of your business&apos;s digital presence with
+            category-level assessments, evidence-backed findings, and practical
+            recommendations.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 flex w-full max-w-[914px] gap-3 rounded-2xl border border-white/[0.06] bg-[#0F1114] px-4 py-5 text-left shadow-[0_8px_40px_rgba(0,0,0,0.45)] sm:gap-4 sm:px-6 sm:py-8 md:px-8">
+          <Info
+            className="mt-0.5 size-6 shrink-0 text-white sm:size-8"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+          <div className="min-w-0">
+            <p className="font-title text-base font-medium text-white">
+              Sample Report
             </p>
-
-            <h2
-              id="sample-report-heading"
-              className="mt-4 font-display text-3xl leading-tight font-medium tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem]"
-            >
-              Know where you stand. See what to improve.
-            </h2>
-
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Get a clear picture of your business&apos;s digital presence with
-              category-level assessments, evidence-backed findings, and
-              practical recommendations.
-            </p>
-
-            <ul className="mt-8 space-y-3 text-sm text-muted-foreground sm:text-[0.9375rem]">
-              <li className="flex gap-2.5">
-                <span
-                  className="mt-2 size-1.5 shrink-0 rounded-full bg-foreground"
-                  aria-hidden="true"
-                />
-                Category scores shown when enough public evidence is available.
-              </li>
-              <li className="flex gap-2.5">
-                <span
-                  className="mt-2 size-1.5 shrink-0 rounded-full bg-foreground"
-                  aria-hidden="true"
-                />
-                Findings tied to observable signals — not service quality
-                ratings.
-              </li>
-              <li className="flex gap-2.5">
-                <span
-                  className="mt-2 size-1.5 shrink-0 rounded-full bg-foreground"
-                  aria-hidden="true"
-                />
-                Prioritized next steps you can act on without guessing.
-              </li>
-            </ul>
-
-            <p className="mt-8 rounded-lg border border-border bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-              The report card on the right is an intentional{" "}
-              <span className="font-medium text-foreground">
-                Sample Report
-              </span>{" "}
-              (illustrative example) with example scores and findings. It is not
-              a verified assessment of a real business and is separate from live
-              audit results.
+            <p className="mt-2 font-heading text-sm leading-relaxed text-gray-400">
+              The report card below is an intentional illustrative example with
+              example scores and findings. It is not a verified assessment of a
+              real business and is separate from live audit results.
             </p>
           </div>
+        </div>
 
+        <div className="mx-auto mt-8 w-full min-w-0 max-w-[914px]">
           <SampleReportCard report={sampleReport} />
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

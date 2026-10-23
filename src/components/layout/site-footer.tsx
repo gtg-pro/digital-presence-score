@@ -1,20 +1,18 @@
 import { Suspense } from "react";
 import Link from "next/link";
 
-import { SiteLogo } from "@/components/shared/site-logo";
+import { fontDmSans } from "@/app/fonts";
 import { Container } from "@/components/ui/container";
 import {
-  footerCta,
+  footerBrand,
   footerLegalLinks,
-  footerQuickLinks,
-  footerResourceLinks,
+  footerLinkColumns,
 } from "@/config/navigation";
-import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/cn";
 
 import { CopyrightYear } from "./copyright-year";
 
-function FooterLink({
+function FooterLegalLink({
   href,
   children,
 }: {
@@ -22,13 +20,47 @@ function FooterLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link
+    <a
       href={href}
       className={cn(
-        "text-sm text-muted-foreground transition-colors hover:text-foreground",
-        "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "text-sm font-medium leading-[22px] text-[#9EA5B3] transition-colors hover:text-[#D9DCE1] hover:underline",
+        "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]",
       )}
     >
+      {children}
+    </a>
+  );
+}
+
+function FooterTextLink({
+  href,
+  children,
+  external = false,
+}: {
+  href: string;
+  children: React.ReactNode;
+  external?: boolean;
+}) {
+  const className = cn(
+    "font-heading text-sm font-medium leading-[22px] text-[#9EA5B3] transition-colors hover:text-[#D9DCE1] hover:underline",
+    "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]",
+  );
+
+  if (
+    external ||
+    href.startsWith("http") ||
+    href.startsWith("mailto:") ||
+    href.startsWith("tel:")
+  ) {
+    return (
+      <a href={href} className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className}>
       {children}
     </Link>
   );
@@ -42,14 +74,14 @@ function FooterNavColumn({
   links: { label: string; href: string }[];
 }) {
   return (
-    <div>
-      <h2 className="text-sm font-semibold tracking-tight text-foreground">
+    <div className="min-w-0">
+      <h2 className="font-title text-lg font-bold tracking-[-0.02em] text-[#D9DCE1]">
         {title}
       </h2>
-      <ul className="mt-4 space-y-3">
+      <ul className="mt-3 flex flex-col gap-2">
         {links.map((link) => (
-          <li key={`${title}-${link.href}-${link.label}`}>
-            <FooterLink href={link.href}>{link.label}</FooterLink>
+          <li key={`${title}-${link.label}`}>
+            <FooterTextLink href={link.href}>{link.label}</FooterTextLink>
           </li>
         ))}
       </ul>
@@ -59,91 +91,95 @@ function FooterNavColumn({
 
 export function SiteFooter() {
   return (
-    <footer id="contact" className="border-t border-border bg-background">
-      <Container className="py-14 sm:py-16 lg:py-20">
-        <div className="rounded-2xl bg-foreground px-6 py-12 text-center text-background sm:px-10 sm:py-14 lg:px-16 lg:py-16">
-          <h2
-            id="contact-heading"
-            className="mx-auto max-w-2xl font-display text-3xl leading-tight font-medium tracking-tight sm:text-4xl lg:text-[2.5rem]"
-          >
-            {footerCta.heading}
-          </h2>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-background/75 sm:text-lg">
-            {footerCta.description}
-          </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
-            <Link
-              href={footerCta.href}
-              className={cn(
-                "inline-flex h-12 w-full cursor-pointer items-center justify-center rounded-lg bg-background px-6 text-sm font-medium text-foreground sm:w-auto",
-                "transition-opacity hover:opacity-90",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground",
-              )}
-            >
-              {footerCta.label}
-            </Link>
-            <Link
-              href={footerCta.secondaryHref}
-              className={cn(
-                "text-sm font-medium text-background underline decoration-background/40 underline-offset-4",
-                "transition-colors hover:decoration-background",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground rounded-sm",
-              )}
-            >
-              {footerCta.secondaryLabel}
-            </Link>
-          </div>
-        </div>
+    <footer
+      id="contact"
+      className="relative isolate overflow-hidden bg-[#0f1115]"
+    >
+      <img
+        src={footerBrand.decorativeSrc}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-0 z-0 h-auto w-[min(90%,640px)] max-w-none select-none opacity-60 sm:w-[min(70%,800px)] lg:w-[min(53%,750px)]"
+      />
 
-        <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
-          <div className="sm:col-span-2 lg:col-span-5">
-            <Link
-              href="/"
-              className={cn(
-                "inline-flex max-w-[14rem] items-center",
-                "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-              )}
+      <Container className="relative z-10 pt-10 pb-0 sm:pt-12 lg:pt-14">
+        <div className="mb-8 flex flex-col gap-10 lg:mb-10 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
+          <div className="flex w-full max-w-[298px] shrink-0 flex-col items-start gap-3">
+            <a
+              href={footerBrand.logoHref}
+              className="inline-flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
             >
-              <SiteLogo width={160} />
-            </Link>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              {siteConfig.footerDescription}
+              <img
+                src={footerBrand.logoSrc}
+                alt={footerBrand.logoAlt}
+                width={170}
+                height={96}
+                className="h-14 w-auto object-contain sm:h-20 lg:h-24"
+              />
+            </a>
+            <p className="font-heading text-sm leading-relaxed font-medium text-[#9EA5B3]">
+              {footerBrand.tagline}
             </p>
           </div>
 
-          <div className="lg:col-span-3">
-            <FooterNavColumn title="Quick Links" links={footerQuickLinks} />
-          </div>
+          <div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:gap-6 xl:gap-8">
+            {footerLinkColumns.map((column) => (
+              <FooterNavColumn
+                key={column.title}
+                title={column.title}
+                links={column.links}
+              />
+            ))}
 
-          <div className="lg:col-span-4">
-            <FooterNavColumn title="Resources" links={footerResourceLinks} />
+            <div className="min-w-0">
+              <h2 className="font-title text-lg font-bold tracking-[-0.02em] text-[#D9DCE1]">
+                Contact
+              </h2>
+              <ul className="mt-3 flex flex-col gap-2">
+                <li>
+                  <FooterTextLink href={footerBrand.contactEmailHref}>
+                    Email
+                  </FooterTextLink>
+                </li>
+                <li>
+                  <FooterTextLink href={footerBrand.contactPhoneHref}>
+                    Phone
+                  </FooterTextLink>
+                </li>
+              </ul>
+            </div>
           </div>
+        </div>
+
+        <div
+          className={cn(
+            fontDmSans.className,
+            "flex w-full flex-col items-center justify-between gap-3 border-t border-[#9EA5B3]/40 py-5 sm:flex-row sm:gap-6",
+          )}
+        >
+          <p className="text-center text-sm tracking-[-0.02em] text-[#9EA5B3] sm:text-left">
+            ©{" "}
+            <Suspense fallback={<span className="inline-block min-w-[3ch]" />}>
+              <CopyrightYear />
+            </Suspense>{" "}
+            {footerBrand.copyrightName} | All Rights Reserved.
+          </p>
+
+          <ul className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
+            {footerLegalLinks.map((link, index) => (
+              <li key={link.href} className="flex items-center gap-3">
+                {index > 0 ? (
+                  <span
+                    aria-hidden="true"
+                    className="h-[11px] w-px bg-[#E5E7EB]/40"
+                  />
+                ) : null}
+                <FooterLegalLink href={link.href}>{link.label}</FooterLegalLink>
+              </li>
+            ))}
+          </ul>
         </div>
       </Container>
-
-      <div className="border-t border-border">
-        <Container className="flex flex-col gap-4 py-6 sm:py-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-muted-foreground">
-              ©{" "}
-              <Suspense fallback={<span className="inline-block min-w-[3ch]" />}>
-                <CopyrightYear />
-              </Suspense>{" "}
-              {siteConfig.name}
-            </p>
-            <ul className="flex flex-wrap gap-x-5 gap-y-2">
-              {footerLegalLinks.map((link) => (
-                <li key={link.href}>
-                  <FooterLink href={link.href}>{link.label}</FooterLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
-            {siteConfig.disclaimer}
-          </p>
-        </Container>
-      </div>
     </footer>
   );
 }

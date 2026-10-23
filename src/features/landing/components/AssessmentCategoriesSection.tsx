@@ -1,9 +1,7 @@
-import { Container } from "@/components/ui/container";
 import {
   assessmentCategories,
   assessmentFrameworkTotalPoints,
 } from "@/features/landing/data/assessment-categories";
-import { cn } from "@/lib/cn";
 
 import { AssessmentCategoryCard } from "./AssessmentCategoryCard";
 
@@ -12,53 +10,47 @@ export function AssessmentCategoriesSection() {
     <section
       id="what-we-check"
       aria-labelledby="what-we-check-heading"
-      className="border-b border-border bg-background"
+      className="relative isolate scroll-mt-28 py-12"
     >
-      <Container className="py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase sm:text-sm">
-            A Complete Digital Assessment
-          </p>
-
+      <div className="relative z-10">
+        <div className="mx-auto max-w-[874px] text-center">
           <h2
             id="what-we-check-heading"
-            className="mt-4 font-display text-3xl leading-tight font-medium tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem]"
+            className="font-title text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[3.25rem] lg:leading-[1.15]"
           >
-            Five key areas. One clearer picture.
+            Five key areas. One{" "}
+            <span className="bg-gradient-to-r from-[#5182EF] to-[#2563EB] bg-clip-text text-transparent">
+              clearer picture.
+            </span>
           </h2>
 
-          <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mx-auto mt-5 max-w-[694px] font-heading text-base leading-relaxed font-medium text-[#9EA5B3] sm:text-lg">
             We assess five essential areas of your public digital presence to
             help you understand what&apos;s working, what needs attention, and
             where to focus next.
           </p>
         </div>
 
-        <ul className="mt-14 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-6 lg:gap-8">
+        <ul className="mt-14 grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-2 md:gap-5">
           {assessmentCategories.map((category, index) => (
-            <li
-              key={category.id}
-              className={cn(
-                "min-w-0",
-                "lg:col-span-2",
-                index === 3 && "lg:col-start-2",
-              )}
-            >
-              <AssessmentCategoryCard category={category} />
+            <li key={category.id} className="min-w-0">
+              <AssessmentCategoryCard category={category} index={index} />
             </li>
           ))}
-        </ul>
 
-        <p className="mt-10 text-center text-sm text-muted-foreground sm:mt-12">
-          <span className="font-medium text-foreground">
-            {assessmentFrameworkTotalPoints}-Point Assessment Framework
-          </span>
-          <span className="mt-1 block sm:mt-0 sm:ml-2 sm:inline">
-            Public digital presence signals only — not a measure of service
-            quality or official search rankings.
-          </span>
-        </p>
-      </Container>
+          <li className="min-w-0">
+            <article className="relative h-full rounded-2xl border border-white/[0.04] bg-[#0F1114] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.35)] md:p-6">
+              <h3 className="font-title text-base font-medium tracking-tight text-white md:text-lg">
+                {assessmentFrameworkTotalPoints}-Point Assessment Framework
+              </h3>
+              <p className="mt-3 font-heading text-[13px] leading-relaxed text-gray-400 md:text-sm">
+                Public digital presence signals only — not a measure of service
+                quality or official search rankings.
+              </p>
+            </article>
+          </li>
+        </ul>
+      </div>
     </section>
   );
 }

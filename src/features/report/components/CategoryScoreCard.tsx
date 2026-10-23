@@ -10,32 +10,31 @@ export function CategoryScoreCard({
   const percent = hasScore
     ? Math.round((category.earned! / category.maxPoints) * 100)
     : 0;
-  const statusLabel =
-    category.statusLabel ??
-    (category.status === "assessed"
-      ? "Reviewed"
-      : category.status === "partially_assessed"
-        ? "Partially reviewed"
-        : "Limited information");
 
   return (
-    <article className="rounded-xl border border-border bg-background p-5 shadow-sm sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-semibold tracking-tight text-foreground">
-            {category.title}
-          </h3>
-          <p className="mt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            {statusLabel}
-          </p>
-        </div>
-        <p className="font-mono text-sm font-semibold text-foreground">
-          {hasScore ? `${category.earned}/${category.maxPoints}` : `—/${category.maxPoints}`}
+    <article className="border-b border-white/10 py-6 last:border-b-0 last:pb-0 first:pt-0">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="font-title text-base font-semibold tracking-tight text-white sm:text-lg">
+          {category.title}
+        </h3>
+        <p className="font-heading text-sm font-medium tabular-nums sm:text-base">
+          {hasScore ? (
+            <>
+              <span className="text-white">
+                {category.earned}/{category.maxPoints}
+              </span>{" "}
+              <span className="text-[#2563EB]">{percent}%</span>
+            </>
+          ) : (
+            <span className="text-[#9EA5B3]">
+              —/{category.maxPoints} Limited information
+            </span>
+          )}
         </p>
       </div>
 
       <div
-        className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted"
+        className="mt-3 h-2 overflow-hidden rounded-full bg-white/10"
         role={hasScore ? "progressbar" : undefined}
         aria-valuenow={hasScore ? category.earned! : undefined}
         aria-valuemin={0}
@@ -48,14 +47,14 @@ export function CategoryScoreCard({
       >
         <div
           className={cn(
-            "h-full rounded-full bg-foreground",
+            "h-full rounded-full bg-[#2563EB]",
             !hasScore && "w-0 bg-transparent",
           )}
           style={hasScore ? { width: `${percent}%` } : undefined}
         />
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-3 font-heading text-sm leading-relaxed text-[#9EA5B3]">
         {category.summary}
       </p>
     </article>

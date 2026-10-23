@@ -39,8 +39,7 @@ export type AuditStreamErrorEvent = {
     | "assessment_failed"
     | "aborted"
     | "timeout"
-    | "handoff_failed"
-    | "captcha_failed";
+    | "handoff_failed";
   message: string;
   retryable: boolean;
   at: string;
@@ -54,6 +53,4 @@ export type AuditStreamEvent =
 export type PendingAuditCookiePayload = AuditRunRequestBody & {
   createdAt: number;
   nonce: string;
-  /** Set only after successful server-side reCAPTCHA verification. */
-  captchaVerified: true;
 };

@@ -264,7 +264,7 @@ export const partialAuditDemo: DigitalPresenceReport = {
   outcome: "partial",
   businessName: "Example Service Company",
   website: "example-service.com",
-  serviceArea: "Austin, TX metro (user-supplied)",
+  serviceArea: "City Name, Province/State | example-service.com",
   serviceAreaSource: "user_supplied",
   auditDateLabel: "Illustrative date — demo only",
   reportId: "DPRC-DEMO-PARTIAL-002",

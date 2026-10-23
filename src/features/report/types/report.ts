@@ -21,6 +21,8 @@ export type ReportSummary = {
   isDemo: boolean;
   businessName: string;
   website: string;
+  /** Optional service-area label shown under the business name on preview cards. */
+  serviceArea?: string;
   statusLabel: string;
   scoringVersion: string;
   assessedAtLabel: string;

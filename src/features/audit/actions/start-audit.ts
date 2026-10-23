@@ -6,36 +6,16 @@ import { stashPendingAudit } from "@/features/audit/lib/pending-audit-session";
 import { validateAuditRunRequest } from "@/features/audit/lib/validate-audit-run-request";
 import type { AuditFormValues } from "@/features/audit/types/audit-form.types";
 import { validateAuditForm } from "@/features/audit/lib/validate-audit-form";
-import {
-  canSkipRecaptchaForE2E,
-  verifyRecaptchaV2,
-} from "@/lib/recaptcha/verify-recaptcha";
 
 export type StartAuditResult =
   | { ok: true }
   | { ok: false; message: string; fieldErrors?: Record<string, string> };
 
-async function requireCaptcha(
-  captchaToken: string | null | undefined,
-): Promise<StartAuditResult | null> {
-  if (canSkipRecaptchaForE2E()) {
-    return null;
-  }
-
-  const verified = await verifyRecaptchaV2({ token: captchaToken });
-  if (!verified.ok) {
-    return { ok: false, message: verified.message };
-  }
-  return null;
-}
-
 /**
- * Validate form values, verify CAPTCHA, stash a short-lived pending audit cookie,
- * redirect to progress.
+ * Validate form values, stash a short-lived pending audit cookie, redirect to progress.
  */
 export async function startAuditFromForm(
   values: AuditFormValues,
-  captchaToken?: string | null,
 ): Promise<StartAuditResult> {
   const fieldErrors = validateAuditForm(values);
   if (Object.keys(fieldErrors).length > 0) {
@@ -45,9 +25,6 @@ export async function startAuditFromForm(
       fieldErrors: fieldErrors as Record<string, string>,
     };
   }
-
-  const captchaFailure = await requireCaptcha(captchaToken);
-  if (captchaFailure) return captchaFailure;
 
   const validated = validateAuditRunRequest({
     websiteUrl: values.websiteUrl,
@@ -77,15 +54,11 @@ export async function startAuditFromForm(
 }
 
 /**
- * Homepage hero URL → CAPTCHA → pending audit → progress.
+ * Homepage hero URL → pending audit → progress.
  */
 export async function startAuditFromWebsiteUrl(
   websiteUrl: string,
-  captchaToken?: string | null,
 ): Promise<StartAuditResult> {
-  const captchaFailure = await requireCaptcha(captchaToken);
-  if (captchaFailure) return captchaFailure;
-
   const validated = validateAuditRunRequest({
     websiteUrl,
     entryMode: "url",
