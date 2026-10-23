@@ -16,7 +16,7 @@ const playwrightRuntimeAssets = [
 ] as const;
 
 const nextConfig: NextConfig = {
-  basePath: "/tools/digital-presence-score",
+  // basePath: "/tools/digital-presence-score",
   /* config options here */
   experimental: {
     agentFeedback: true,
