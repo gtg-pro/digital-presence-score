@@ -41,16 +41,64 @@ export const footerResourceLinks: NavItem[] = [
 ];
 
 export const footerLegalLinks: NavItem[] = [
-  { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
 ];
 
-export const footerCta = {
+/** Mid-page Ready to Build CTA band (landing). */
+export const readyToBuildCta = {
   heading: "Ready to see how your business performs online?",
-  description:
-    "Get a clear digital-presence assessment with practical findings and recommendations based on available public evidence for your business.",
-  label: "Get My Free Report Card",
-  href: "/#home",
-  secondaryLabel: "See How It Works",
-  secondaryHref: "/#how-it-works",
+  primaryLabel: "Get My Free Report Card",
+  primaryHref: "/#home",
+  secondaryLabel: "Call Now",
 } as const;
+
+const brandHome = "https://goodtogo.pro/";
+const brandContact = "https://goodtogo.pro/contact-us/";
+
+/** Baqi Digital footer columns (Figma footer). */
+export const footerBrand = {
+  logoSrc:
+    "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1770303568/Logo_1_gr6aag.svg",
+  logoAlt: "Baqi Digital",
+  tagline:
+    "Modern marketing systems engineered for growth. Serving North American service businesses.",
+  copyrightName: "Baqi Digital",
+  decorativeSrc:
+    "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1792734979/27472512_1332_2_isrbig.svg",
+} as const;
+
+export const footerLinkColumns: { title: string; links: NavItem[] }[] = [
+  {
+    title: "Services",
+    links: [
+      { label: "Paid Ads Systems", href: brandHome },
+      { label: "SEO Systems", href: brandHome },
+      { label: "Funnels & Landing Pages", href: brandHome },
+      { label: "CRM Systems & Automations", href: brandHome },
+      { label: "Analytics & Attribution", href: brandHome },
+      { label: "Advisory Services", href: brandHome },
+    ],
+  },
+  {
+    title: "Industries",
+    links: [
+      { label: "Legal", href: brandHome },
+      { label: "Real Estate", href: brandHome },
+      { label: "Beauty & Esthetics", href: brandHome },
+      { label: "Medical & Wellness", href: brandHome },
+      { label: "Home Services & Trades", href: brandHome },
+      { label: "Automotive", href: brandHome },
+      { label: "E-Commerce", href: brandHome },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", href: brandHome },
+      { label: "Services", href: brandHome },
+      { label: "Industries", href: brandHome },
+      { label: "Contact", href: brandContact },
+    ],
+  },
+];

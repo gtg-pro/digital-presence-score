@@ -10,21 +10,17 @@ function getYearSnapshot() {
   return new Date().getFullYear();
 }
 
-function getServerYearSnapshot() {
-  return null;
-}
-
-/** Defers `Date` to the client so prerender stays stable under Cache Components. */
+/**
+ * Year must match on server and client during hydration.
+ * Returning the calendar year from both snapshots avoids a
+ * useSyncExternalStore getServerSnapshot ≠ getSnapshot warning.
+ */
 export function CopyrightYear() {
   const year = useSyncExternalStore(
     subscribe,
     getYearSnapshot,
-    getServerYearSnapshot,
+    getYearSnapshot,
   );
 
-  if (year === null) {
-    return <span className="inline-block min-w-[3ch]" aria-hidden="true" />;
-  }
-
-  return <>{year}</>;
+  return <span suppressHydrationWarning>{year}</span>;
 }

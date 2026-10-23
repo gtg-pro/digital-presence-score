@@ -7,10 +7,10 @@ import { sampleReport } from "@/features/report/data/sample-report";
 import { reportDemoFixtures } from "@/features/report/data/report.mock";
 import { mapAssessmentToReport } from "@/features/report/adapters/assessment-to-report";
 import {
-  footerCta,
   footerQuickLinks,
   mainNav,
   primaryCta,
+  readyToBuildCta,
 } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 import { runAssessment } from "@/lib/audit/orchestration/assessment";
@@ -151,8 +151,8 @@ describe("Prompt 22 — accurate public claims", () => {
   it("primary CTAs point to real destinations", () => {
     expect(primaryCta.href).toBe("/#contact");
     expect(primaryCta.label).toBe("Contact");
-    expect(footerCta.href).toBe("/#home");
-    expect(footerCta.label).toBe("Get My Free Report Card");
+    expect(readyToBuildCta.primaryHref).toBe("/#home");
+    expect(readyToBuildCta.primaryLabel).toBe("Get My Free Report Card");
     expect(mainNav.some((item) => item.href === "/#why-it-matters")).toBe(true);
     expect(
       mainNav.findIndex((item) => item.href === "/#why-it-matters"),
@@ -169,7 +169,7 @@ describe("Prompt 22 — accurate public claims", () => {
     }
   });
 
-  it("black contact CTA lives at the top of the footer, not as a mid-page section", () => {
+  it("contact anchor remains on the footer; landing CTA is ReadyToBuildSection", () => {
     const footer = readFileSync(
       path.join(root, "src/components/layout/site-footer.tsx"),
       "utf8",
@@ -179,8 +179,8 @@ describe("Prompt 22 — accurate public claims", () => {
       "utf8",
     );
     expect(footer).toContain('id="contact"');
-    expect(footer).toContain("footerCta");
-    expect(footer).toContain("bg-foreground");
+    expect(footer).not.toContain("footerCta");
+    expect(marketing).toContain("ReadyToBuildSection");
     expect(marketing).not.toContain("PrimaryCTASection");
   });
 

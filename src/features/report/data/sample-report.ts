@@ -10,10 +10,11 @@ export const sampleReport: ReportSummary = {
   isDemo: true,
   businessName: completeAuditDemo.businessName,
   website: completeAuditDemo.website ?? "",
+  serviceArea: "City Name, Province/State",
   scoringVersion: completeAuditDemo.scoringVersion,
   assessedAtLabel: "Illustrative date",
   statusLabel: completeAuditDemo.statusLabel,
-  overallScore: completeAuditDemo.overallScore,
+  overallScore: 64,
   maxScore: completeAuditDemo.maxScore,
   maturityBand: completeAuditDemo.maturityBand,
   categories: completeAuditDemo.categories.map((category) => ({

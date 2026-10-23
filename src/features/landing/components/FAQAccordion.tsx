@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { Minus, Plus } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import type { FAQItem } from "@/features/landing/data/faqs";
 import { cn } from "@/lib/cn";
@@ -21,14 +21,17 @@ export function FAQAccordion({ items, defaultOpenId }: FAQAccordionProps) {
   if (items.length === 0) return null;
 
   return (
-    <div className="border-t border-border">
+    <div className="space-y-5">
       {items.map((item) => {
         const isOpen = openId === item.id;
         const triggerId = `${baseId}-trigger-${item.id}`;
         const panelId = `${baseId}-panel-${item.id}`;
 
         return (
-          <div key={item.id} className="border-b border-border">
+          <div
+            key={item.id}
+            className="rounded-2xl border border-white/10 bg-[#0F1114] px-4 py-4 sm:px-4"
+          >
             <h3 className="m-0">
               <button
                 id={triggerId}
@@ -36,22 +39,24 @@ export function FAQAccordion({ items, defaultOpenId }: FAQAccordionProps) {
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 className={cn(
-                  "flex w-full items-start justify-between gap-4 py-5 text-left",
-                  "text-base font-medium tracking-tight text-foreground",
-                  "transition-colors hover:text-foreground/80",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm",
+                  "flex w-full items-start justify-between gap-4 text-left",
+                  "text-base font-medium tracking-tight text-white",
+                  "transition-colors hover:text-white/90",
+                  "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F1114]",
                 )}
                 onClick={() =>
                   setOpenId((current) => (current === item.id ? null : item.id))
                 }
               >
                 <span className="pr-2">{item.question}</span>
-                <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center text-foreground">
-                  {isOpen ? (
-                    <Minus className="size-4" aria-hidden="true" />
-                  ) : (
-                    <Plus className="size-4" aria-hidden="true" />
-                  )}
+                <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center text-[#9EA5B3]">
+                  <ChevronDown
+                    className={cn(
+                      "size-5 transition-transform duration-200",
+                      isOpen && "rotate-180",
+                    )}
+                    aria-hidden="true"
+                  />
                 </span>
               </button>
             </h3>
@@ -67,7 +72,7 @@ export function FAQAccordion({ items, defaultOpenId }: FAQAccordionProps) {
               )}
             >
               <div className="min-h-0">
-                <p className="pb-5 text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
+                <p className="pt-3 text-sm leading-relaxed text-[#9EA5B3] sm:text-[0.9375rem]">
                   {item.answer}
                 </p>
               </div>

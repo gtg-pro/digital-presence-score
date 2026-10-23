@@ -129,15 +129,24 @@ function CtaLink({
 
 export function Navbar() {
   const pathname = usePathname();
-  const hash = useSyncExternalStore(
+  const hashFromStore = useSyncExternalStore(
     subscribeHash,
     getHashSnapshot,
     getServerHashSnapshot,
   );
+  const [hashReady, setHashReady] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [prevPathname, setPrevPathname] = useState(pathname);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const menuId = useId();
+
+  // Keep hash "" until after mount so SSR HTML matches the first client paint
+  // (window.location.hash is unavailable on the server).
+  const hash = hashReady ? hashFromStore : "";
+
+  useEffect(() => {
+    setHashReady(true);
+  }, []);
 
   if (pathname !== prevPathname) {
     setPrevPathname(pathname);
