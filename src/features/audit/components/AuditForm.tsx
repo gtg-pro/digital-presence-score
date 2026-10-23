@@ -106,15 +106,7 @@ export function AuditForm({
       return;
     }
 
-    if (!siteKey) {
-      setErrors((current) => ({
-        ...current,
-        form: "Security verification is temporarily unavailable. Please try again later.",
-      }));
-      return;
-    }
-
-    if (!captchaToken) {
+    if (siteKey && !captchaToken) {
       setErrors((current) => ({
         ...current,
         form: "Please complete the CAPTCHA verification.",

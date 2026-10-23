@@ -40,6 +40,7 @@ export const completeAuditDemo: DigitalPresenceReport = {
   auditDateLabel: "Illustrative date — demo only",
   reportId: "DPRC-DEMO-COMPLETE-001",
   scoringVersion: "strict-v1.0",
+  statusLabel: "Complete Audit (Demo)",
   evidenceCoveragePercent: 92,
   overallScore: 62,
   maxScore: scoringTotalPoints,

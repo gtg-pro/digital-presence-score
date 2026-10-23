@@ -77,16 +77,16 @@ export function ReportActions({ report }: ReportActionsProps) {
   return (
     <section
       aria-labelledby="report-actions-heading"
-      className="space-y-5 rounded-xl border border-border bg-background p-6 shadow-sm"
+      className="space-y-5 rounded-2xl border border-white/10 bg-[#0F1114] p-6 sm:p-8"
     >
       <div>
         <h2
           id="report-actions-heading"
-          className="text-2xl font-semibold tracking-tight text-foreground"
+          className="text-2xl font-semibold tracking-tight text-white"
         >
           Report actions
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-[#9EA5B3]">
           {isDemo
             ? "Download illustrative PDF or PNG exports of this sample report. Email delivery and public sharing are not available."
             : "Download a PDF or PNG of this report. Email delivery and public sharing are not available."}
@@ -97,7 +97,7 @@ export function ReportActions({ report }: ReportActionsProps) {
         <Button
           type="button"
           variant="secondary"
-          className="gap-2"
+          className="gap-2 border-white/20 bg-white/5 text-white hover:bg-white/10"
           disabled={busy !== null}
           aria-busy={busy === "pdf"}
           onClick={() => void download("pdf")}
@@ -109,7 +109,7 @@ export function ReportActions({ report }: ReportActionsProps) {
         <Button
           type="button"
           variant="secondary"
-          className="gap-2"
+          className="gap-2 border-white/20 bg-white/5 text-white hover:bg-white/10"
           disabled={busy !== null}
           aria-busy={busy === "png"}
           onClick={() => void download("png")}
@@ -121,7 +121,7 @@ export function ReportActions({ report }: ReportActionsProps) {
       </div>
 
       {error ? (
-        <p className="text-sm text-foreground" role="alert">
+        <p className="text-sm text-white" role="alert">
           {error}
         </p>
       ) : null}

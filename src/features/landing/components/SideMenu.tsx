@@ -40,7 +40,7 @@ export function SideMenu({ variant = "desktop" }: SideMenuProps) {
     return (
       <nav
         aria-label="Section navigation"
-        className="sticky top-[72px] z-20 mb-4 flex gap-2 overflow-x-auto py-2 whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="sticky top-[72px] z-20 mb-4 flex gap-2 overflow-x-auto py-2 font-heading whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {sectionSideNavItems.map((item) => {
           const isActive = activeId === item.id;
@@ -71,7 +71,7 @@ export function SideMenu({ variant = "desktop" }: SideMenuProps) {
     <aside className="sticky top-[100px] z-20 mt-24 hidden self-start lg:block">
       <nav
         aria-label="Section navigation"
-        className="w-[220px] rounded-2xl bg-[#0F1114] p-3"
+        className="w-[220px] rounded-2xl bg-[#0F1114] p-3 font-heading"
       >
         <ul className="m-0 flex list-none flex-col gap-1 p-0">
           {sectionSideNavItems.map((item) => {
@@ -102,7 +102,7 @@ export function SideMenu({ variant = "desktop" }: SideMenuProps) {
           href="/#home"
           className={cn(
             "group relative z-10 mt-3 flex w-full items-center justify-between gap-2 rounded-full bg-blue-600 py-1.5 pr-1.5 pl-4",
-            "text-sm font-medium text-white transition-colors hover:bg-blue-500",
+            "font-button text-sm font-medium text-white transition-colors hover:bg-blue-500",
             "focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500",
           )}
         >

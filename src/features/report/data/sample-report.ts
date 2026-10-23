@@ -10,7 +10,7 @@ export const sampleReport: ReportSummary = {
   isDemo: true,
   businessName: completeAuditDemo.businessName,
   website: completeAuditDemo.website ?? "",
-  serviceArea: "City Name, Province/State",
+  serviceArea: "",
   scoringVersion: completeAuditDemo.scoringVersion,
   assessedAtLabel: "Illustrative date",
   statusLabel: completeAuditDemo.statusLabel,

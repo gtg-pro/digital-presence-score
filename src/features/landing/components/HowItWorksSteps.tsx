@@ -48,10 +48,10 @@ export function HowItWorksSteps() {
             </div>
 
             <div className="relative z-10 mt-5 px-4">
-              <h3 className="text-lg leading-snug font-semibold text-white">
+              <h3 className="font-title text-lg leading-snug font-semibold text-white">
                 {step.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-400">
+              <p className="mt-2 font-heading text-sm leading-relaxed text-gray-400">
                 {step.description}
               </p>
             </div>

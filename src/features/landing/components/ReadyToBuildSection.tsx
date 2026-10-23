@@ -35,13 +35,13 @@ export function ReadyToBuildSection() {
             src={CTA_LEFT_VISUAL_URL}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute top-10 -right-6 z-0 h-full w-auto max-w-[min(58%,520px)] scale-110 object-contain object-right select-none opacity-50 sm:top-12 sm:-right-10 sm:max-w-[min(52%,560px)] sm:opacity-60"
+            className="pointer-events-none absolute top-0 right-0 z-0 h-full w-[min(48%,460px)] max-w-none object-cover object-right select-none opacity-55 sm:w-[min(42%,520px)] sm:opacity-65"
           />
 
-          <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-8 px-6 text-center sm:gap-9 sm:px-10">
+          <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-8 px-6 pr-[min(28%,9rem)] text-center sm:gap-9 sm:px-10 sm:pr-[min(32%,11rem)]">
             <h2
               id="ready-to-build-heading"
-              className="max-w-2xl text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[2.5rem]"
+              className="max-w-2xl font-title text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[2.5rem]"
             >
               {readyToBuildCta.heading}
             </h2>
@@ -50,7 +50,7 @@ export function ReadyToBuildSection() {
               <Link
                 href={readyToBuildCta.primaryHref}
                 className={cn(
-                  "group inline-flex h-14 w-full items-center justify-center gap-3 rounded-full bg-[#2563EB] px-5 text-base font-medium tracking-[-0.02em] text-white sm:w-auto",
+                  "group inline-flex h-14 w-full items-center justify-center gap-3 rounded-full bg-[#2563EB] px-5 font-button text-base font-medium tracking-[-0.02em] text-white sm:w-auto",
                   "shadow-[0_0_24px_rgba(37,99,235,0.35)] transition-colors duration-300 ease-out hover:bg-[#1d4ed8]",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1C1C1C]",
                 )}
@@ -73,7 +73,7 @@ export function ReadyToBuildSection() {
               <a
                 href={`tel:${siteConfig.contactPhoneTel}`}
                 className={cn(
-                  "group inline-flex w-full cursor-pointer items-center justify-center gap-4 rounded-full border border-[#9ea5b3] px-3 py-2 text-[14px] font-medium text-white sm:w-auto sm:px-5 sm:text-[16px]",
+                  "group inline-flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-[#9ea5b3] px-5 font-button text-base font-medium tracking-[-0.02em] text-white sm:w-auto",
                   "transition-all duration-300 ease-in-out hover:border-[#2563eb] hover:bg-[#2563eb]",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1C1C1C]",
                 )}
@@ -81,9 +81,9 @@ export function ReadyToBuildSection() {
                 <span className="transition-transform duration-300 group-hover:translate-x-[-2px]">
                   {readyToBuildCta.secondaryLabel}
                 </span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[#ffffff] transition-all duration-300 group-hover:translate-x-[2px] group-hover:border-[#2563eb] group-hover:bg-[#ffffff] sm:h-7 sm:w-7">
+                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-white transition-all duration-300 group-hover:translate-x-[2px] group-hover:border-white group-hover:bg-white">
                   <Phone
-                    className="h-3 w-3 text-white transition-colors duration-300 group-hover:text-black sm:h-4 sm:w-4"
+                    className="size-4 text-white transition-colors duration-300 group-hover:text-black"
                     aria-hidden="true"
                   />
                 </span>

@@ -1,16 +1,9 @@
-import { CircleAlert } from "lucide-react";
+import type { DigitalPresenceReport } from "@/features/report/types/report.types";
 
-import type {
-  DigitalPresenceReport,
-  IssueSeverity,
-} from "@/features/report/types/report.types";
-import { cn } from "@/lib/cn";
+import { ReportBenefitBullet } from "./ReportBenefitBullet";
 
-const severityLabel: Record<IssueSeverity, string> = {
-  high: "High severity",
-  medium: "Medium severity",
-  low: "Low severity",
-};
+const IMPROVEMENT_ICON_URL =
+  "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1792757135/Icon_rrpbpp.svg";
 
 export function ImprovementSection({
   report,
@@ -19,66 +12,51 @@ export function ImprovementSection({
 }) {
   if (report.improvements.length === 0) return null;
 
+  const midpoint = Math.ceil(report.improvements.length / 2);
+  const leftColumn = report.improvements.slice(0, midpoint);
+  const rightColumn = report.improvements.slice(midpoint);
+
   return (
-    <section aria-labelledby="improvements-heading" className="space-y-5">
-      <div>
+    <section
+      aria-labelledby="improvements-heading"
+      className="w-full space-y-8 md:space-y-12"
+    >
+      <div className="flex w-full flex-col items-center gap-2 text-center md:gap-3">
         <h2
           id="improvements-heading"
-          className="text-2xl font-semibold tracking-tight text-foreground"
+          className="font-title text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-[2.25rem] lg:leading-[44px]"
         >
-          Improvement opportunities
+          Improvement <span className="text-[#2563EB]">Opportunities</span>
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="font-heading text-sm text-[#9EA5B3] sm:text-base">
           {report.isDemo
             ? "Prioritized illustrative issues for this sample report."
             : "Prioritized improvement opportunities from this assessment."}
         </p>
       </div>
-      <ul className="space-y-4">
-        {report.improvements.map((item) => (
-          <li
-            key={item.id}
-            className="rounded-xl border border-border bg-background p-5 shadow-sm"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex min-w-0 items-start gap-3">
-                <CircleAlert
-                  className="mt-0.5 size-5 shrink-0 text-foreground"
-                  aria-hidden="true"
-                />
-                <h3 className="text-base font-semibold text-foreground">
-                  {item.title}
-                </h3>
-              </div>
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium tracking-wide text-foreground",
-                )}
-              >
-                {severityLabel[item.severity]}
-              </span>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {item.description}
-            </p>
-            <p className="mt-2 text-sm text-foreground">
-              <span className="font-medium">Why it matters:</span>{" "}
-              <span className="text-muted-foreground">{item.whyItMatters}</span>
-            </p>
-            {item.evidenceLabel ? (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Evidence: {item.evidenceLabel}
-              </p>
-            ) : null}
-            <p className="mt-3 text-sm font-medium text-foreground">
-              Next action:{" "}
-              <span className="font-normal text-muted-foreground">
-                {item.recommendedAction}
-              </span>
-            </p>
-          </li>
-        ))}
-      </ul>
+
+      <div className="grid w-full grid-cols-1 gap-3 md:grid-cols-2 md:gap-x-10 md:gap-y-6 lg:gap-x-16">
+        <div className="flex flex-col gap-3 md:gap-6">
+          {leftColumn.map((item) => (
+            <ReportBenefitBullet
+              key={item.id}
+              icon={IMPROVEMENT_ICON_URL}
+              label={item.title}
+              description={item.description}
+            />
+          ))}
+        </div>
+        <div className="flex flex-col gap-3 md:gap-6">
+          {rightColumn.map((item) => (
+            <ReportBenefitBullet
+              key={item.id}
+              icon={IMPROVEMENT_ICON_URL}
+              label={item.title}
+              description={item.description}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

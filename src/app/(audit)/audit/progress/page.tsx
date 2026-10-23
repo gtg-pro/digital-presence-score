@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { AuditProgressPage } from "@/features/audit/components/AuditProgressPage";
 import { loadPendingAudit } from "@/features/audit/lib/pending-audit-session";
+import { HeroSection } from "@/features/landing/components/HeroSection";
 
 export const metadata: Metadata = {
   title: "Assessment Progress",
@@ -18,14 +19,25 @@ async function AuditProgressLoader() {
 
 export default function AuditProgressRoutePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">
-          Preparing assessment…
-        </div>
-      }
-    >
-      <AuditProgressLoader />
-    </Suspense>
+    <>
+      <HeroSection
+        sectionId="audit-progress-hero"
+        headingId="audit-progress-hero-heading"
+        badgeText="Digital Presence Assessment"
+        heading="Let's Discover Your Digital Potential."
+        description="Tell us a little about your business to get a clearer picture of your online presence, identify opportunities for improvement, and receive personalized recommendations to strengthen your digital growth."
+        showUrlInput={false}
+        showFooterNote={false}
+      />
+      <Suspense
+        fallback={
+          <div className="bg-black px-4 py-16 text-center text-sm text-[#9EA5B3]">
+            Preparing assessment…
+          </div>
+        }
+      >
+        <AuditProgressLoader />
+      </Suspense>
+    </>
   );
 }

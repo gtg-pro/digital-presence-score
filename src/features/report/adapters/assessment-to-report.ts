@@ -81,6 +81,16 @@ function formatUtcLabel(iso: string): string {
   }).format(new Date(ms));
 }
 
+/** Customer-facing assessment date on the report card — date only, no time. */
+function formatUtcDateLabel(iso: string): string {
+  const ms = Date.parse(iso);
+  if (!Number.isFinite(ms)) return iso;
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(new Date(ms));
+}
+
 /** Allow only http(s) URLs for rendering. */
 export function safeHttpUrl(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -286,12 +296,12 @@ export function mapAssessmentToReport(
       result.business.serviceAreaSignals[0] ??
       (result.business.businessModel !== "unknown"
         ? result.business.businessModel.replace(/_/g, " ")
-        : "Not specified"),
+        : ""),
     serviceAreaSource:
       result.business.serviceAreaSignals.length > 0
         ? "verified"
         : "user_supplied",
-    auditDateLabel: formatUtcLabel(result.assessedAt),
+    auditDateLabel: formatUtcDateLabel(result.assessedAt),
     reportId: result.assessmentId,
     scoringVersion: result.scoringVersion,
     statusLabel: statusLabelFor(result.status),

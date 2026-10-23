@@ -14,13 +14,13 @@ export function HowItWorksSection() {
       <div className="relative z-10">
         <h2
           id="how-it-works-heading"
-          className="text-center text-4xl leading-tight font-semibold text-white md:text-5xl"
+          className="text-center font-title text-4xl leading-tight font-semibold text-white md:text-5xl"
         >
           Understand Your Digital Presence In{" "}
           <span className="text-blue-500">3 Simple Steps.</span>
         </h2>
 
-        <p className="mx-auto mt-4 max-w-xl text-center text-base text-gray-400">
+        <p className="mx-auto mt-4 max-w-xl text-center font-heading text-base text-gray-400">
           From your website URL to a clear action plan, discover where your
           business stands and what needs improvement.
         </p>

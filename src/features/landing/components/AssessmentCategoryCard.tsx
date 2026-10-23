@@ -2,17 +2,23 @@ import type { AssessmentCategory } from "@/features/landing/data/assessment-cate
 import { cn } from "@/lib/cn";
 
 export type AssessmentCategoryCardProps = {
-  category: AssessmentCategory;
+  /** Full landing category, or a title/description pair for reuse (e.g. report next steps). */
+  category: Pick<AssessmentCategory, "title" | "description"> &
+    Partial<Pick<AssessmentCategory, "id" | "maxPoints">>;
   index?: number;
   className?: string;
+  /** When false, hides the Max pts column (report next-step cards). Default true. */
+  showMaxPoints?: boolean;
 };
 
 export function AssessmentCategoryCard({
   category,
   index = 0,
   className,
+  showMaxPoints = true,
 }: AssessmentCategoryCardProps) {
   const stepLabel = String(index + 1).padStart(2, "0");
+  const maxPoints = category.maxPoints;
 
   return (
     <article
@@ -29,20 +35,22 @@ export function AssessmentCategoryCard({
           >
             {stepLabel}
           </span>
-          <h3 className="text-base font-medium tracking-tight text-white md:text-lg">
+          <h3 className="font-title text-base font-medium tracking-tight text-white md:text-lg">
             {category.title}
           </h3>
         </div>
 
-        <div className="shrink-0 text-right leading-tight">
-          <div className="text-[11px] text-gray-400">Max</div>
-          <div className="text-sm font-medium text-gray-300">
-            {category.maxPoints} pts
+        {showMaxPoints && maxPoints != null ? (
+          <div className="shrink-0 text-right font-heading leading-tight">
+            <div className="text-[11px] text-gray-400">Max</div>
+            <div className="text-sm font-medium text-gray-300">
+              {maxPoints} pts
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
 
-      <p className="mt-4 text-[13px] leading-relaxed text-gray-400 md:text-sm">
+      <p className="mt-4 font-heading text-[13px] leading-relaxed text-gray-400 md:text-sm">
         {category.description}
       </p>
     </article>

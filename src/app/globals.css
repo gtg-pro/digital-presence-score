@@ -9,6 +9,22 @@
   --ring: #0a0a0a;
   --primary: #0a0a0a;
   --primary-foreground: #ffffff;
+
+  /* Brand type roles — next/font sets --font-* tokens on <html> */
+  --font-family-title: var(--font-satoshi), "Satoshi", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-family-heading: var(--font-inter), "Inter", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-family-button: var(--font-karla), "Karla", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-family-legal: var(--font-dm-sans), "DM Sans", ui-sans-serif, system-ui,
+    sans-serif;
+}
+
+/* Explicit utility so footer legal bar always resolves DM Sans */
+@utility font-legal {
+  font-family: var(--font-dm-sans), "DM Sans", ui-sans-serif, system-ui,
+    sans-serif;
 }
 
 @theme inline {
@@ -23,6 +39,11 @@
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-newsreader);
   --font-mono: var(--font-geist-mono);
+  /* Utilities: font-title | font-heading | font-button | font-legal */
+  --font-title: var(--font-family-title);
+  --font-heading: var(--font-family-heading);
+  --font-button: var(--font-family-button);
+  --font-legal: var(--font-family-legal);
 }
 
 html {
@@ -34,7 +55,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-family-heading);
 }
 
 button:not(:disabled),

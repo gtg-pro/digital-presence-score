@@ -11,7 +11,7 @@ export function BenefitsSection() {
         <div className="mx-auto max-w-[874px] text-center">
           <h2
             id="benefits-heading"
-            className="text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[3.25rem] lg:leading-[1.15]"
+            className="font-title text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[3.25rem] lg:leading-[1.15]"
           >
             Stop guessing. Start{" "}
             <span className="bg-gradient-to-r from-[#5182EF] to-[#2563EB] bg-clip-text text-transparent">
@@ -19,7 +19,7 @@ export function BenefitsSection() {
             </span>
           </h2>
 
-          <p className="mx-auto mt-5 max-w-[694px] text-base leading-relaxed font-medium text-[#9EA5B3] sm:text-lg">
+          <p className="mx-auto mt-5 max-w-[694px] font-heading text-base leading-relaxed font-medium text-[#9EA5B3] sm:text-lg">
             Understand how your business appears online, identify opportunities
             for improvement, and focus on the changes that matter.
           </p>
@@ -42,11 +42,11 @@ export function BenefitsSection() {
                     />
                   </span>
 
-                  <h3 className="mt-4 text-base font-medium tracking-tight text-white md:text-[17px]">
+                  <h3 className="mt-4 font-title text-base font-medium tracking-tight text-white md:text-[17px]">
                     {benefit.title}
                   </h3>
 
-                  <p className="mx-auto mt-2 max-w-[17rem] text-sm leading-relaxed text-gray-400">
+                  <p className="mx-auto mt-2 max-w-[17rem] font-heading text-sm leading-relaxed text-gray-400">
                     {benefit.description}
                   </p>
                 </article>

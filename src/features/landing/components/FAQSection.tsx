@@ -13,7 +13,7 @@ export function FAQSection() {
         <div className="mx-auto max-w-[756px] text-center">
           <h2
             id="faqs-heading"
-            className="text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[3.25rem] lg:leading-[1.15]"
+            className="font-title text-3xl leading-tight font-bold tracking-tight text-white sm:text-4xl lg:text-[3.25rem] lg:leading-[1.15]"
           >
             Everything you{" "}
             <span className="bg-gradient-to-r from-[#5182EF] to-[#2563EB] bg-clip-text text-transparent">
@@ -21,7 +21,7 @@ export function FAQSection() {
             </span>
           </h2>
 
-          <p className="mx-auto mt-4 max-w-[574px] text-base leading-relaxed font-medium text-[#9EA5B3] sm:text-lg">
+          <p className="mx-auto mt-4 max-w-[574px] font-button text-base leading-relaxed font-medium text-[#9EA5B3] sm:text-lg">
             Learn how the assessment works, what we evaluate, and what to expect
             from your Digital Presence Score.
           </p>

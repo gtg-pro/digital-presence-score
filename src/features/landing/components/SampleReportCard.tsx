@@ -78,14 +78,12 @@ export function SampleReportCard({
   const hasNumericScore =
     report.overallScore !== null && report.overallScore !== undefined;
 
-  const subtitle = [report.serviceArea, report.website]
-    .filter(Boolean)
-    .join(" | ");
+  const websiteLabel = report.website?.trim() || null;
 
   return (
     <article
       className={cn(
-        "w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-neutral-400/70 bg-[#1c1c1c] text-white shadow-[0_0_48px_rgba(37,99,235,0.18),0_12px_40px_rgba(0,0,0,0.55)]",
+        "w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-neutral-400/70 bg-[#1c1c1c] font-title text-white shadow-[0_0_48px_rgba(37,99,235,0.18),0_12px_40px_rgba(0,0,0,0.55)]",
         className,
       )}
       aria-label={
@@ -99,8 +97,10 @@ export function SampleReportCard({
           <h3 className="truncate text-lg font-medium tracking-tight text-white sm:text-xl">
             {report.businessName}
           </h3>
-          {subtitle ? (
-            <p className="break-words text-sm text-gray-400">{subtitle}</p>
+          {websiteLabel ? (
+            <p className="break-words font-heading text-sm text-gray-400">
+              {websiteLabel}
+            </p>
           ) : null}
         </div>
       </header>
@@ -192,13 +192,15 @@ export function SampleReportCard({
         </div>
 
         <div className="min-w-0">
-          <h4 className="text-sm font-medium text-gray-400">Key Finding</h4>
+          <h4 className="font-heading text-sm font-medium text-gray-400">
+            Key Finding
+          </h4>
           {report.isDemo ? (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 font-heading text-xs text-gray-500">
               Example findings for illustration — not from a real audit.
             </p>
           ) : null}
-          <ul className="mt-3 space-y-2.5">
+          <ul className="mt-3 space-y-2.5 font-title">
             {report.findings.map((finding) => (
               <li
                 key={`${finding.type}-${finding.text}`}
@@ -229,7 +231,7 @@ export function SampleReportCard({
           </ul>
         </div>
 
-        <div className="min-w-0">
+        <div className="min-w-0 font-title">
           <h4 className="text-sm font-medium text-gray-400">
             Priority Recommendations
           </h4>
@@ -255,7 +257,7 @@ export function SampleReportCard({
           <span
             aria-hidden="true"
             className={cn(
-              "inline-flex h-12 w-full select-none items-center justify-center gap-3 rounded-full bg-[#2563EB] px-4 text-sm font-bold tracking-[-0.02em] text-white sm:h-14 sm:w-auto sm:px-5 sm:text-base",
+              "inline-flex h-12 w-full select-none items-center justify-center gap-3 rounded-full bg-[#2563EB] px-4 font-button text-sm font-bold tracking-[-0.02em] text-white sm:h-14 sm:w-auto sm:px-5 sm:text-base",
               "pointer-events-none",
             )}
           >
@@ -270,7 +272,7 @@ export function SampleReportCard({
           <span
             aria-hidden="true"
             className={cn(
-              "inline-flex h-12 w-full select-none items-center justify-center gap-2 rounded-full border border-white/20 bg-transparent px-4 text-sm font-medium text-white sm:h-14 sm:w-auto sm:px-5 sm:text-base",
+              "inline-flex h-12 w-full select-none items-center justify-center gap-2 rounded-full border border-white/20 bg-transparent px-4 font-button text-sm font-medium text-white sm:h-14 sm:w-auto sm:px-5 sm:text-base",
               "pointer-events-none",
             )}
           >

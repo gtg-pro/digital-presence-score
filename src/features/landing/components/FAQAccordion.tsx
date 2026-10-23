@@ -40,7 +40,7 @@ export function FAQAccordion({ items, defaultOpenId }: FAQAccordionProps) {
                 aria-controls={panelId}
                 className={cn(
                   "flex w-full items-start justify-between gap-4 text-left",
-                  "text-base font-medium tracking-tight text-white",
+                  "font-title text-base font-medium tracking-tight text-white",
                   "transition-colors hover:text-white/90",
                   "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F1114]",
                 )}
@@ -72,7 +72,7 @@ export function FAQAccordion({ items, defaultOpenId }: FAQAccordionProps) {
               )}
             >
               <div className="min-h-0">
-                <p className="pt-3 text-sm leading-relaxed text-[#9EA5B3] sm:text-[0.9375rem]">
+                <p className="pt-3 font-button text-sm leading-relaxed text-[#9EA5B3] sm:text-[0.9375rem]">
                   {item.answer}
                 </p>
               </div>

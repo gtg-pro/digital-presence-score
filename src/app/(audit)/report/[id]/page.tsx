@@ -57,7 +57,7 @@ export default function ReportRoutePage({
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-5xl px-4 py-16 text-sm text-muted-foreground">
+        <div className="bg-black px-4 py-16 text-center text-sm text-[#9EA5B3]">
           Loading report…
         </div>
       }

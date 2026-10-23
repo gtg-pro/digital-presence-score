@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 
+import { fontDmSans } from "@/app/fonts";
 import { Container } from "@/components/ui/container";
 import {
   footerBrand,
@@ -22,7 +23,7 @@ function FooterTextLink({
   external?: boolean;
 }) {
   const className = cn(
-    "text-sm font-medium leading-[22px] text-[#9EA5B3] transition-colors hover:text-[#D9DCE1] hover:underline",
+    "font-heading text-sm font-medium leading-[22px] text-[#9EA5B3] transition-colors hover:text-[#D9DCE1] hover:underline",
     "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]",
   );
 
@@ -56,7 +57,7 @@ function FooterNavColumn({
 }) {
   return (
     <div className="min-w-0">
-      <h2 className="text-lg font-bold tracking-[-0.02em] text-[#D9DCE1]">
+      <h2 className="font-title text-lg font-bold tracking-[-0.02em] text-[#D9DCE1]">
         {title}
       </h2>
       <ul className="mt-3 flex flex-col gap-2">
@@ -67,6 +68,26 @@ function FooterNavColumn({
         ))}
       </ul>
     </div>
+  );
+}
+
+function FooterLegalLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "text-sm font-medium leading-[22px] text-[#9EA5B3] transition-colors hover:text-[#D9DCE1] hover:underline",
+        "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]",
+      )}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -98,7 +119,7 @@ export function SiteFooter() {
                 className="h-14 w-auto object-contain sm:h-20 lg:h-24"
               />
             </Link>
-            <p className="text-sm leading-relaxed font-medium text-[#9EA5B3]">
+            <p className="font-heading text-sm leading-relaxed font-medium text-[#9EA5B3]">
               {footerBrand.tagline}
             </p>
           </div>
@@ -113,7 +134,7 @@ export function SiteFooter() {
             ))}
 
             <div className="min-w-0">
-              <h2 className="text-lg font-bold tracking-[-0.02em] text-[#D9DCE1]">
+              <h2 className="font-title text-lg font-bold tracking-[-0.02em] text-[#D9DCE1]">
                 Contact
               </h2>
               <ul className="mt-3 flex flex-col gap-2">
@@ -132,7 +153,12 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex w-full flex-col items-center justify-between gap-3 border-t border-[#9EA5B3]/40 py-5 sm:flex-row sm:gap-6">
+        <div
+          className={cn(
+            fontDmSans.className,
+            "flex w-full flex-col items-center justify-between gap-3 border-t border-[#9EA5B3]/40 py-5 sm:flex-row sm:gap-6",
+          )}
+        >
           <p className="text-center text-sm tracking-[-0.02em] text-[#9EA5B3] sm:text-left">
             ©{" "}
             <Suspense fallback={<span className="inline-block min-w-[3ch]" />}>
@@ -150,7 +176,7 @@ export function SiteFooter() {
                     className="h-[11px] w-px bg-[#E5E7EB]/40"
                   />
                 ) : null}
-                <FooterTextLink href={link.href}>{link.label}</FooterTextLink>
+                <FooterLegalLink href={link.href}>{link.label}</FooterLegalLink>
               </li>
             ))}
           </ul>
