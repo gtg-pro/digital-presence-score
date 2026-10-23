@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import type { AuditFormFieldProps } from "@/features/audit/types/audit-form.types";
@@ -40,15 +38,8 @@ export function AuditConsentFields({
           />
           <div className="space-y-1">
             <Label htmlFor="agreeToTerms" className="font-normal leading-snug">
-              I agree to the{" "}
-              <Link
-                href="/terms"
-                className="font-medium text-foreground underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground"
-              >
-                assessment terms
-              </Link>{" "}
-              and acknowledge that the tool will analyze publicly accessible
-              business information.{" "}
+              I agree to the assessment terms and acknowledge that the tool will
+              analyze publicly accessible business information.{" "}
               <span className="text-foreground">*</span>
             </Label>
             <FieldError

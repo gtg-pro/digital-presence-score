@@ -35,14 +35,18 @@ export const footerQuickLinks: NavItem[] = [
 
 export const footerResourceLinks: NavItem[] = [
   { label: "FAQs", href: "/#faqs", isSection: true },
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms of Service", href: "/terms" },
   { label: "Assessment Methodology", href: "/methodology" },
 ];
 
 export const footerLegalLinks: NavItem[] = [
-  { label: "Terms of Service", href: "/terms" },
-  { label: "Privacy Policy", href: "/privacy" },
+  {
+    label: "Terms of Services",
+    href: "https://baqidigital.com/terms-of-service/",
+  },
+  {
+    label: "Policies",
+    href: "https://baqidigital.com/privacy-policy/",
+  },
 ];
 
 /** Mid-page Ready to Build CTA band (landing). */
@@ -53,52 +57,91 @@ export const readyToBuildCta = {
   secondaryLabel: "Call Now",
 } as const;
 
-const brandHome = "https://goodtogo.pro/";
-const brandContact = "https://goodtogo.pro/contact-us/";
-
 /** Baqi Digital footer columns (Figma footer). */
 export const footerBrand = {
   logoSrc:
     "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1770303568/Logo_1_gr6aag.svg",
   logoAlt: "Baqi Digital",
+  logoHref: "https://baqidigital.com/",
   tagline:
     "Modern marketing systems engineered for growth. Serving North American service businesses.",
   copyrightName: "Baqi Digital",
   decorativeSrc:
     "https://res.cloudinary.com/dxxwzp4qs/image/upload/v1792734979/27472512_1332_2_isrbig.svg",
+  contactEmailHref: "mailto:info@baqidigital.com",
+  contactPhoneHref: "tel:+16479437069",
 } as const;
 
 export const footerLinkColumns: { title: string; links: NavItem[] }[] = [
   {
     title: "Services",
     links: [
-      { label: "Paid Ads Systems", href: brandHome },
-      { label: "SEO Systems", href: brandHome },
-      { label: "Funnels & Landing Pages", href: brandHome },
-      { label: "CRM Systems & Automations", href: brandHome },
-      { label: "Analytics & Attribution", href: brandHome },
-      { label: "Advisory Services", href: brandHome },
+      {
+        label: "Paid Ads Systems",
+        href: "https://baqidigital.com/services/paid-ads-systems/",
+      },
+      {
+        label: "SEO Systems",
+        href: "https://baqidigital.com/services/seo-systems/",
+      },
+      {
+        label: "Funnels & Landing Pages",
+        href: "https://baqidigital.com/services/funnels-and-landing-pages/",
+      },
+      {
+        label: "CRM Systems & Automations",
+        href: "https://baqidigital.com/services/crm-systems-automations/",
+      },
+      {
+        label: "Analytics & Attribution",
+        href: "https://baqidigital.com/services/analytics-attribution/",
+      },
+      {
+        label: "Advisory Services",
+        href: "https://baqidigital.com/services/advisory-services/",
+      },
     ],
   },
   {
     title: "Industries",
     links: [
-      { label: "Legal", href: brandHome },
-      { label: "Real Estate", href: brandHome },
-      { label: "Beauty & Esthetics", href: brandHome },
-      { label: "Medical & Wellness", href: brandHome },
-      { label: "Home Services & Trades", href: brandHome },
-      { label: "Automotive", href: brandHome },
-      { label: "E-Commerce", href: brandHome },
+      {
+        label: "Legal",
+        href: "https://baqidigital.com/industries/legal/",
+      },
+      {
+        label: "Real Estate",
+        href: "https://baqidigital.com/industries/real-estate/",
+      },
+      {
+        label: "Beauty & Esthetics",
+        href: "https://baqidigital.com/industries/beauty-esthetics/",
+      },
+      {
+        label: "Medical & Wellness",
+        href: "https://baqidigital.com/industries/medical-wellness/",
+      },
+      {
+        label: "Home Services & Trades",
+        href: "https://baqidigital.com/industries/home-services-trades/",
+      },
+      {
+        label: "Automotive",
+        href: "https://baqidigital.com/industries/automotive/",
+      },
+      {
+        label: "E-Commerce",
+        href: "https://baqidigital.com/industries/e-commerce/",
+      },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "About", href: brandHome },
-      { label: "Services", href: brandHome },
-      { label: "Industries", href: brandHome },
-      { label: "Contact", href: brandContact },
+      { label: "About", href: "https://baqidigital.com/about/" },
+      { label: "Services", href: "https://baqidigital.com/services/" },
+      { label: "Industries", href: "https://baqidigital.com/industries/" },
+      { label: "Contact", href: "https://baqidigital.com/contact-us/" },
     ],
   },
 ];

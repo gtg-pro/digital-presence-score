@@ -8,10 +8,29 @@ import {
   footerLegalLinks,
   footerLinkColumns,
 } from "@/config/navigation";
-import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/cn";
 
 import { CopyrightYear } from "./copyright-year";
+
+function FooterLegalLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      className={cn(
+        "text-sm font-medium leading-[22px] text-[#9EA5B3] transition-colors hover:text-[#D9DCE1] hover:underline",
+        "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]",
+      )}
+    >
+      {children}
+    </a>
+  );
+}
 
 function FooterTextLink({
   href,
@@ -27,15 +46,14 @@ function FooterTextLink({
     "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]",
   );
 
-  if (external || href.startsWith("http") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+  if (
+    external ||
+    href.startsWith("http") ||
+    href.startsWith("mailto:") ||
+    href.startsWith("tel:")
+  ) {
     return (
-      <a
-        href={href}
-        className={className}
-        {...(href.startsWith("http")
-          ? { target: "_blank", rel: "noopener noreferrer" }
-          : {})}
-      >
+      <a href={href} className={className}>
         {children}
       </a>
     );
@@ -71,26 +89,6 @@ function FooterNavColumn({
   );
 }
 
-function FooterLegalLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "text-sm font-medium leading-[22px] text-[#9EA5B3] transition-colors hover:text-[#D9DCE1] hover:underline",
-        "rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]",
-      )}
-    >
-      {children}
-    </Link>
-  );
-}
-
 export function SiteFooter() {
   return (
     <footer
@@ -107,8 +105,8 @@ export function SiteFooter() {
       <Container className="relative z-10 pt-10 pb-0 sm:pt-12 lg:pt-14">
         <div className="mb-8 flex flex-col gap-10 lg:mb-10 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
           <div className="flex w-full max-w-[298px] shrink-0 flex-col items-start gap-3">
-            <Link
-              href={siteConfig.brandUrl}
+            <a
+              href={footerBrand.logoHref}
               className="inline-flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
             >
               <img
@@ -118,7 +116,7 @@ export function SiteFooter() {
                 height={96}
                 className="h-14 w-auto object-contain sm:h-20 lg:h-24"
               />
-            </Link>
+            </a>
             <p className="font-heading text-sm leading-relaxed font-medium text-[#9EA5B3]">
               {footerBrand.tagline}
             </p>
@@ -139,12 +137,12 @@ export function SiteFooter() {
               </h2>
               <ul className="mt-3 flex flex-col gap-2">
                 <li>
-                  <FooterTextLink href={`mailto:${siteConfig.contactEmail}`}>
+                  <FooterTextLink href={footerBrand.contactEmailHref}>
                     Email
                   </FooterTextLink>
                 </li>
                 <li>
-                  <FooterTextLink href={`tel:${siteConfig.contactPhoneTel}`}>
+                  <FooterTextLink href={footerBrand.contactPhoneHref}>
                     Phone
                   </FooterTextLink>
                 </li>

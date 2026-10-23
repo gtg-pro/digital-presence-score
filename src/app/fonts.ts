@@ -6,7 +6,7 @@ import localFont from "next/font/local";
  * - Titles (Satoshi) — hero titles, section titles, badge labels
  * - Headings / body copy (Inter) — supporting text, nav, placeholders
  * - Buttons / FAQ-footer body (Karla) — CTAs and secondary copy
- * - Legal / meta (DM Sans) — copyright + Terms / Privacy
+ * - Legal / meta (DM Sans) — copyright bar
  */
 export const fontSatoshi = localFont({
   src: [
